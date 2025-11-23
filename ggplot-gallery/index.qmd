@@ -5,20 +5,20 @@ title: "ggplot Gallery – graph replication"
 Choose a graph and try to replicate it as accurately as possible in ggplot.
 On the task page, you will find the target image, hints, data, and the hidden solution.
 
-::: columns
-::: column width="33%"
+::: {.columns}
 
+::: {.column width="33%"}
 [![](_assets/img/01_target.png){fig-alt="Scatter + smooth"}](plots/01_scatter_smooth.qmd)
 
 **01 – Scatter + smooth**
 Level 1
-
 :::
-::: column width="33%"
 
+::: {.column width="33%"}
 [![](_assets/img/02_target.png){fig-alt="Boxplot + jitter"}](plots/02_box_jitter.qmd)
 
 **02 – Boxplot + jitter**
 Level 1
+:::
 
 :::

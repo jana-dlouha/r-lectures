@@ -4,6 +4,7 @@ title: "R Lectures"
 
 Welcome to my teaching space for R.
 Here you will find:
+
 - a gallery of ggplot tasks to replicate
 - mini-tutorials and handouts
 - data exercise books
