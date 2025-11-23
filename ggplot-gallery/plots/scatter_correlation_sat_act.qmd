@@ -1,0 +1,123 @@
+---
+title: "Scatterplot with correlation"
+---
+
+## Goal
+
+In this task, you will recreate a correlation scatterplot using **SAT Verbal** and **SAT Quantitative** scores.  
+The aim is to practice:
+
+- mapping `x` and `y`,
+- adding layers (`geom_point()`, `geom_smooth()`),
+- interpreting a correlation annotation.
+
+At the bottom of the page, you will find the **hidden full solution**.
+
+## Data
+
+We use the cleaned dataset `sat_act.csv` prepared earlier in `src/data_prep/sat_act.R`.
+
+```{r setup, include=TRUE, echo=FALSE}
+library(tidyverse)
+library(ggpubr)
+```
+
+---
+
+## Step 1: Start with a basic scatterplot
+
+```{r step1, echo=TRUE, eval=TRUE}
+df <- read_csv2("../../src/data/sat_act.csv")
+
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point()
+```
+
+---
+
+## Step 2: Add a regression line
+
+```{r step2, echo=TRUE, eval=TRUE}
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE)
+```
+
+---
+
+## Step 3: Improve readability
+
+```{r step3, echo=TRUE, eval=TRUE}
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    x = "SAT Verbal",
+    y = "SAT Quantitative",
+    title = "SAT Verbal vs SAT Quantitative"
+  )
+```
+
+---
+
+## Step 4: Add the correlation annotation (optional)
+
+```{r step4, echo=TRUE, eval=TRUE}
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  stat_cor(method = "pearson", label.x = 200, size = 6) +
+  labs(
+    x = "SAT Verbal",
+    y = "SAT Quantitative",
+    title = "SAT Verbal vs SAT Quantitative"
+  )
+```
+
+---
+
+## Optional style improvements
+
+```{r step5, echo=TRUE, eval=TRUE}
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  stat_cor(method = "pearson", label.x = 200, size = 6) +
+  labs(
+    x = "SAT Verbal",
+    y = "SAT Quantitative",
+    title = "SAT Verbal vs SAT Quantitative"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+---
+
+## Final target graph
+
+![](_assets/img/scatter_correlation_sat_act.png)
+
+---
+
+## Hidden solution
+
+```{r solution, echo=FALSE, eval=TRUE}
+ggplot(df, aes(SATV, SATQ)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 1.1) +
+  stat_cor(method = "pearson", label.x = 200, size = 6) +
+  labs(
+    x = "SAT Verbal",
+    y = "SAT Quantitative",
+    title = "SAT Verbal vs SAT Quantitative"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+```
