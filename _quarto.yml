@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - _shared/
 
 website:
   title: "R Lectures"
@@ -11,10 +13,16 @@ website:
       - href: ggplot-gallery/index.qmd
         text: ggplot Gallery
 
+execute:
+  warning: false
+  message: false
+  eval: true
+  echo: true
+
 format:
   html:
     theme: cosmo
     toc: true
     code-fold: true
     code-summary: "Show solution"
-    css: _shared/styles.css
+    css: "/_shared/styles.css"
