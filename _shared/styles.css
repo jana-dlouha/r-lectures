@@ -1,0 +1,66 @@
+/* --- Gallery grid: slightly smaller cards, still 3 per row --- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.6rem;
+  margin-top: 2rem;
+}
+
+/* --- Card box --- */
+.gallery-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  /* make internal layout predictable */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hover stays subtle */
+.gallery-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+/* --- Images: unified size, a bit lower to leave text space --- */
+.gallery-card img {
+  width: 100%;
+  height: 165px;        /* lower than before => more room for text */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+}
+
+/* --- Typography --- */
+.gallery-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+
+.gallery-meta {
+  font-size: 0.88rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+/* --- FIX: allow wrapping and kill horizontal scroll --- */
+.gallery-desc {
+  font-size: 0.95rem;
+  color: #333;
+
+  white-space: normal;         /* normal wrapping */
+  overflow-wrap: anywhere;     /* break long tokens if needed */
+  word-break: break-word;      /* backstop for older browsers */
+  overflow-x: hidden;          /* no horizontal scrollbar */
+}
+
+/* If you have inline code in the descriptions, force it to wrap too */
+.gallery-desc code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

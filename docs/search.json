@@ -1,5 +1,145 @@
 [
   {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "title": "Scatterplot with correlation",
+    "section": "",
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "title": "Scatterplot with correlation",
+    "section": "",
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "title": "Scatterplot with correlation",
+    "section": "Data",
+    "text": "Data\nWe use the cleaned dataset sat_act.csv prepared earlier in src/data_prep/sat_act.R."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Scatterplot with correlation",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\ndf &lt;- read_csv2(\"../../src/data/sat_act.csv\")\n\nggplot(df, aes(SATV, SATQ)) +\n  geom_point()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "title": "Scatterplot with correlation",
+    "section": "Step 2: Add a regression line",
+    "text": "Step 2: Add a regression line\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "title": "Scatterplot with correlation",
+    "section": "Step 3: Improve readability",
+    "text": "Step 3: Improve readability\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "title": "Scatterplot with correlation",
+    "section": "Step 4: Add the correlation annotation (optional)",
+    "text": "Step 4: Add the correlation annotation (optional)\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 6) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "title": "Scatterplot with correlation",
+    "section": "Optional style improvements",
+    "text": "Optional style improvements\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 6) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  ) +\n  theme_minimal(base_size = 14) +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    panel.grid.minor = element_blank()\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#final-target-graph",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#final-target-graph",
+    "title": "Scatterplot with correlation",
+    "section": "Final target graph",
+    "text": "Final target graph"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#hidden-solution",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#hidden-solution",
+    "title": "Scatterplot with correlation",
+    "section": "Hidden solution",
+    "text": "Hidden solution"
+  },
+  {
+    "objectID": "ggplot-gallery/index.html",
+    "href": "ggplot-gallery/index.html",
+    "title": "ggplot Gallery – graph replication",
+    "section": "",
+    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n\n  \n\nTwo-layer scatterplot\n\n\nLevel 1 • layers + smoothing\n\n\nTwo-layer plot: points + a smooth trend line.\n\n\n\n  \n\nScatter correlation (SAT)\n\n\nLevel 1 • correlation + regression\n\n\nExplore the relationship between SAT Verbal and SAT Quantitative scores."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html",
+    "href": "ggplot-gallery/plots/scatter_smooth.html",
+    "title": "Two-layer scatterplot",
+    "section": "",
+    "text": "This task trains the basic ggplot workflow: mapping aesthetics, adding layers, and reading a smooth trend."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "title": "Two-layer scatterplot",
+    "section": "Goal",
+    "text": "Goal\nReplicate a scatterplot with a smooth trend line.\nFocus first on structure (layers), then on style."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#data",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#data",
+    "title": "Two-layer scatterplot",
+    "section": "Data",
+    "text": "Data\nWe will use the built-in cars dataset (speed vs. stopping distance).\n\n\nShow solution\n# Load packages (no output)\nlibrary(tidyverse)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Two-layer scatterplot",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\nggplot(cars, aes(x = speed, y = dist)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: - ggplot(data, aes(...)) defines what is plotted. - geom_point() draws the points."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "title": "Two-layer scatterplot",
+    "section": "Step 2: Improve readability of points",
+    "text": "Step 2: Improve readability of points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2)\n\n\n\n\n\n\n\n\n\nHints: - size changes point size. - alpha makes points semi-transparent (helps with overplotting)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "title": "Two-layer scatterplot",
+    "section": "Step 3: Add a smooth trend line",
+    "text": "Step 3: Add a smooth trend line\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(se = TRUE)\n\n\n\n\n\n\n\n\n\nHints: - geom_smooth() adds a model-based trend. - se = TRUE shows a confidence band (gray ribbon)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "title": "Two-layer scatterplot",
+    "section": "Step 4: Tune the smooth (optional but closer to target)",
+    "text": "Step 4: Tune the smooth (optional but closer to target)\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(method = \"loess\", se = TRUE)\n\n\n\n\n\n\n\n\n\nNotes: - LOESS gives a flexible curve (good for small datasets). - Line color and thickness are styling details."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "title": "Two-layer scatterplot",
+    "section": "Step 5: Final polish (labels + clean theme)",
+    "text": "Step 5: Final polish (labels + clean theme)\nHints: - make points a little more transparent (70%) - add labs and title - x-axis label “Speed (mph)” - y-axis label “stopping distance (ft)” - plot title “Cars: speed and stopping distance” - set size of all text in the plot to 14 points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2, alpha = 0.7) +\n  geom_smooth(method = \"loess\", se = TRUE) +\n  labs(\n    x = \"Speed (mph)\",\n    y = \"Stopping distance (ft)\",\n    title = \"Cars: speed and stopping distance\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "title": "Two-layer scatterplot",
+    "section": "Extra challenges",
+    "text": "Extra challenges\n\nRemove the gray confidence band.\nTry a linear trend instead of LOESS.\nChange the point color and add a matching smooth line."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "R Lectures",
@@ -12,19 +152,5 @@
     "title": "R Lectures",
     "section": "Modules",
     "text": "Modules\n\nggplot Gallery Training in reading and composing graphs in ggplot2 using the replication method."
-  },
-  {
-    "objectID": "ggplot-gallery/index.html",
-    "href": "ggplot-gallery/index.html",
-    "title": "ggplot Gallery – graph replication",
-    "section": "",
-    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n\n\n01 – Scatter + smooth Level 1\n\n\n02 – Boxplot + jitter Level 1"
-  },
-  {
-    "objectID": "ggplot-gallery/plots/01_scatter_smooth.html#data",
-    "href": "ggplot-gallery/plots/01_scatter_smooth.html#data",
-    "title": "01 – Scatter + smooth",
-    "section": "Data",
-    "text": "Data\nUse the gapminder dataset.\n\n\nShow solution\nlibrary(tidyverse)\n\n\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr     1.1.4     ✔ readr     2.1.5\n✔ forcats   1.0.0     ✔ stringr   1.5.1\n✔ ggplot2   3.5.2     ✔ tibble    3.3.0\n✔ lubridate 1.9.4     ✔ tidyr     1.3.1\n✔ purrr     1.1.0     \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors\n\n\nShow solution\nlibrary(gapminder)\ntheme_set(theme_minimal(base_size = 14))\n\n\n\n\nShow solution\n# Write your code here\n\n\n\n\nShow solution\nggplot(gapminder, aes(year, lifeExp, color = continent)) +\n  geom_point(alpha = 0.6) +\n  geom_smooth(se = FALSE) +\n  labs(x = \"Year\", y = \"Life expectancy\")\n\n\n`geom_smooth()` using method = 'loess' and formula = 'y ~ x'"
   }
 ]

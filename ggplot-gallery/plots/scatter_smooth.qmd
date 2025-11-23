@@ -1,0 +1,95 @@
+---
+title: "Two-layer scatterplot"
+---
+
+This task trains the basic ggplot workflow: mapping aesthetics, adding layers,
+and reading a smooth trend.
+
+## Goal
+Replicate a scatterplot with a smooth trend line.  
+Focus first on *structure* (layers), then on *style*.
+
+## Data
+We will use the built-in `cars` dataset (speed vs. stopping distance).
+
+```{r setup}
+# Load packages (no output)
+library(tidyverse)
+```
+
+## Step 1: Start with a basic scatterplot
+
+```{r step1}
+ggplot(cars, aes(x = speed, y = dist)) +
+  geom_point()
+```
+
+What to notice:
+- `ggplot(data, aes(...))` defines *what* is plotted.
+- `geom_point()` draws the points.
+
+## Step 2: Improve readability of points
+
+```{r step2}
+ggplot(cars, aes(speed, dist)) +
+  geom_point(size = 2)
+```
+
+Hints:
+- `size` changes point size.
+- `alpha` makes points semi-transparent (helps with overplotting).
+
+## Step 3: Add a smooth trend line
+
+```{r step3}
+ggplot(cars, aes(speed, dist)) +
+  geom_point(size = 2) +
+  geom_smooth(se = TRUE)
+```
+
+Hints:
+- `geom_smooth()` adds a model-based trend.
+- `se = TRUE` shows a confidence band (gray ribbon).
+
+## Step 4: Tune the smooth (optional but closer to target)
+
+```{r step4}
+ggplot(cars, aes(speed, dist)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "loess", se = TRUE)
+```
+
+Notes:
+- LOESS gives a flexible curve (good for small datasets).
+- Line color and thickness are styling details.
+
+## Step 5: Final polish (labels + clean theme)
+
+Hints:
+- make points a little more transparent (70%)
+- add labs and title
+  - x-axis label "Speed (mph)"
+  - y-axis label "stopping distance (ft)"
+  - plot title "Cars: speed and stopping distance"
+- set size of all text in the plot to 14 points
+
+
+```{r step5}
+ggplot(cars, aes(speed, dist)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_smooth(method = "loess", se = TRUE) +
+  labs(
+    x = "Speed (mph)",
+    y = "Stopping distance (ft)",
+    title = "Cars: speed and stopping distance"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+---
+
+
+## Extra challenges
+1. Remove the gray confidence band.
+2. Try a linear trend instead of LOESS.
+3. Change the point color and add a matching smooth line.
