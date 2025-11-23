@@ -91,18 +91,11 @@
     "text": "Goal\nReplicate a scatterplot with a smooth trend line.\nFocus first on structure (layers), then on style."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#data",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#data",
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
     "title": "Two-layer scatterplot",
-    "section": "Data",
-    "text": "Data\nWe will use the built-in cars dataset (speed vs. stopping distance).\n\n\nShow solution\n# Load packages (no output)\nlibrary(tidyverse)"
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-0-preview-the-data",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-0-preview-the-data",
-    "title": "Two-layer scatterplot",
-    "section": "Step 0: Preview the data",
-    "text": "Step 0: Preview the data\n\n\nShow solution\ncars\n\n\n   speed dist\n1      4    2\n2      4   10\n3      7    4\n4      7   22\n5      8   16\n6      9   10\n7     10   18\n8     10   26\n9     10   34\n10    11   17\n11    11   28\n12    12   14\n13    12   20\n14    12   24\n15    12   28\n16    13   26\n17    13   34\n18    13   34\n19    13   46\n20    14   26\n21    14   36\n22    14   60\n23    14   80\n24    15   20\n25    15   26\n26    15   54\n27    16   32\n28    16   40\n29    17   32\n30    17   40\n31    17   50\n32    18   42\n33    18   56\n34    18   76\n35    18   84\n36    19   36\n37    19   46\n38    19   68\n39    20   32\n40    20   48\n41    20   52\n42    20   56\n43    20   64\n44    22   66\n45    23   54\n46    24   70\n47    24   92\n48    24   93\n49    24  120\n50    25   85"
+    "section": "Load and preview data",
+    "text": "Load and preview data\nWe will use the built-in cars dataset (speed vs. stopping distance) from the tidyverse package\n\n\nShow solution\nlibrary(tidyverse)\n\nhead(cars)\n\n\n  speed dist\n1     4    2\n2     4   10\n3     7    4\n4     7   22\n5     8   16\n6     9   10"
   },
   {
     "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",

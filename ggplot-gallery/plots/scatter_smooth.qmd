@@ -9,18 +9,13 @@ and reading a smooth trend.
 Replicate a scatterplot with a smooth trend line.  
 Focus first on *structure* (layers), then on *style*.
 
-## Data
-We will use the built-in `cars` dataset (speed vs. stopping distance).
+## Load and preview data
+We will use the built-in `cars` dataset (speed vs. stopping distance) from the `tidyverse` package
 
 ```{r setup}
-# Load packages (no output)
 library(tidyverse)
-```
 
-## Step 0: Preview the data
-
-```{r step0}
-cars
+head(cars)
 ```
 
 ## Step 1: Start with a basic scatterplot
