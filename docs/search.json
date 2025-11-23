@@ -18,7 +18,7 @@
     "href": "ggplot-gallery/index.html",
     "title": "ggplot Gallery – graph replication",
     "section": "",
-    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n::: column width=“33%”01 – Scatter + smooth Level 1\n\n::: column width=“33%”\n\n02 – Boxplot + jitter Level 1\n::: ::::"
+    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n::: column width=“33%”01 – Scatter + smooth Level 1\n\n::: column width=“33%”\n\n02 – Boxplot + jitter Level 1\n:::"
   },
   {
     "objectID": "ggplot-gallery/plots/01_scatter_smooth.html#data",
