@@ -2,7 +2,7 @@
 title: "01 – Scatter + smooth"
 ---
 
-![]("../_assets/img/01_target.png")
+![](../_assets/img/01_target.png)
 
 ## Data
 Use the `gapminder` dataset.
