@@ -5,20 +5,29 @@ title: "ggplot Gallery – graph replication"
 Choose a graph and try to replicate it as accurately as possible in ggplot.
 On the task page, you will find the target image, hints, data, and the hidden solution.
 
-::: {.columns}
+<div class="gallery">
 
-::: {.column width="33%"}
-[![](_assets/img/01_target.png){fig-alt="Scatter + smooth"}](plots/01_scatter_smooth.qmd)
+<div class="gallery-card">
+  <a href="plots/scatter_smooth.qmd">
+    <img src="_assets/img/scatter_smooth.png" alt="Two-layer scatterplot">
+  </a>
+  <div class="gallery-title">Two-layer scatterplot</div>
+  <div class="gallery-meta">Level 1 • layers + smoothing</div>
+  <div class="gallery-desc">
+    Two-layer plot: points + a smooth trend line.
+  </div>
+</div>
 
-**01 – Scatter + smooth**
-Level 1
-:::
+<div class="gallery-card">
+  <a href="plots/scatter_correlation_sat_act.qmd">
+    <img src="_assets/img/scatter_correlation_sat_act.png"
+         alt="Correlation scatterplot (SAT Verbal vs SAT Quantitative)">
+  </a>
+  <div class="gallery-title">Scatter correlation (SAT)</div>
+  <div class="gallery-meta">Level 1 • correlation + regression</div>
+  <div class="gallery-desc">
+    Explore the relationship between SAT Verbal and SAT Quantitative scores.
+  </div>
+</div>
 
-::: {.column width="33%"}
-[![](_assets/img/02_target.png){fig-alt="Boxplot + jitter"}](plots/02_box_jitter.qmd)
-
-**02 – Boxplot + jitter**
-Level 1
-:::
-
-:::
+</div>
