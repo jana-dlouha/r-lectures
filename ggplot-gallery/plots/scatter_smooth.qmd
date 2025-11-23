@@ -17,6 +17,12 @@ We will use the built-in `cars` dataset (speed vs. stopping distance).
 library(tidyverse)
 ```
 
+## Step 0: Preview the data
+
+```{r step0}
+cars
+```
+
 ## Step 1: Start with a basic scatterplot
 
 ```{r step1}
