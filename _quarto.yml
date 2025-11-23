@@ -1,20 +1,15 @@
 project:
   type: website
   output-dir: docs
-  render:
-    - "src/**/*.qmd"
 
 website:
   title: "R Lectures"
   navbar:
     left:
-      - href: src/index.qmd
+      - href: index.qmd
         text: Home
-      - href: src/ggplot-gallery/index.qmd
+      - href: ggplot-gallery/index.qmd
         text: ggplot Gallery
-    right:
-      - icon: github
-        href: https://github.com/jana-dlouha/r-lectures
 
 format:
   html:
@@ -22,6 +17,4 @@ format:
     toc: true
     code-fold: true
     code-summary: "Show solution"
-    code-tools: true
-    css: src/_shared/styles.css
-    link-external-newwindow: true
+    css: _shared/styles.css
