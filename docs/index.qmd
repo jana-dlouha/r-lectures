@@ -1,0 +1,15 @@
+---
+title: "R Lectures"
+---
+
+Welcome to my teaching space for R.
+Here you will find:
+- a gallery of ggplot tasks to replicate
+- mini-tutorials and handouts
+- data exercise books
+- (eventually) interactive learnr lessons
+
+## Modules
+
+- **[ggplot Gallery](ggplot-gallery/index.qmd)**
+  Training in reading and composing graphs in ggplot2 using the replication method.
