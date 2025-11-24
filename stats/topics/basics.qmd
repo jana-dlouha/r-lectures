@@ -32,6 +32,7 @@ Questionnaires used in the original study:
 - Depression Anxiety Stress Scales – Short Form (DASS-21) — 21 items. Subscales for depression, anxiety, and stress.
 
 Variables in our teaching file:
+
 - FMPS_total — total maladaptive perfectionism score (higher = more maladaptive perfectionism).
 - DASS_Depress — depression symptoms.
 - DASS_Anx — anxiety symptoms.
@@ -47,6 +48,7 @@ Note: The teaching dataset keeps only variables needed for introductory analyses
 </p>
 
 ```{r setup}
+library(kableExtra)
 library(tidyverse)
 df <- read_csv2("../assets/data/perfectionism_total_scores.csv")
 ```
@@ -88,8 +90,9 @@ quantile(df$FMPS_total, probs = c(.25, .5, .75), na.rm = TRUE)
 df %>%
     select(FMPS_total:DASS_D_Av) %>%
     psych::describe() %>%
-    rownames_to_column("Scale") %>%
-    as_tibble()
+    as.data.frame() %>%
+    kbl(digits = 2) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"))
 
 ```
 

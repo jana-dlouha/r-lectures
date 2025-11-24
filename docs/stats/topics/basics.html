@@ -100,6 +100,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../../shared/styles.css">
@@ -206,14 +208,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Self-Compassion Scale – Short Form (SCS-SF) — 12 items. Total self-compassion score (SELF_C).</li>
 <li>Depression Anxiety Stress Scales – Short Form (DASS-21) — 21 items. Subscales for depression, anxiety, and stress.</li>
 </ul>
-<p>Variables in our teaching file: - FMPS_total — total maladaptive perfectionism score (higher = more maladaptive perfectionism). - DASS_Depress — depression symptoms. - DASS_Anx — anxiety symptoms. - DASS_Stress — stress symptoms. - SELF_C — total self-compassion score.</p>
+<p>Variables in our teaching file:</p>
+<ul>
+<li>FMPS_total — total maladaptive perfectionism score (higher = more maladaptive perfectionism).</li>
+<li>DASS_Depress — depression symptoms.</li>
+<li>DASS_Anx — anxiety symptoms.</li>
+<li>DASS_Stress — stress symptoms.</li>
+<li>SELF_C — total self-compassion score.</li>
+</ul>
 <p>Note: The teaching dataset keeps only variables needed for introductory analyses and may differ slightly in coding/format from the original supporting files.</p>
 <p>
 <a href="../assets/data/perfectionism_total_scores.csv" download=""> Download the dataset (perfectionism_total_scores.csv) </a>
 </p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"../assets/data/perfectionism_total_scores.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"../assets/data/perfectionism_total_scores.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="first-look-at-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="first-look-at-the-data">1. First look at the data</h2>
@@ -307,21 +317,162 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(FMPS_total<span class="sc">:</span>DASS_D_Av) <span class="sc">%&gt;%</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    psych<span class="sc">::</span><span class="fu">describe</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="st">"Scale"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 8 × 14
-  Scale     vars     n    mean     sd  median trimmed    mad    min    max range
-  &lt;chr&gt;    &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-1 FMPS_to…     1   515 6.05e+1 16.8   60      60.1    17.8    24    110       86
-2 SELF_C       2   515 2.81e+0  0.766  2.73    2.80    0.855   1      5        4
-3 DASS_De…     3   515 1.36e+1  6.00  12      13.0     5.93    7     28       21
-4 DASS_Anx     4   515 1.23e+1  5.20  11      11.6     4.45    7     28       21
-5 DASS_St…     5   515 1.53e+1  5.67  15      15.0     5.93    7     28       21
-6 FMPS_Av      6   515 3.88e-5 16.8   -0.532  -0.421  17.8   -36.5   49.5     86
-7 SELF_C_…     7   515 4.43e-4  0.766 -0.0822 -0.0148  0.855  -1.81   2.19     4
-8 DASS_D_…     8   515 6.80e-5  6.00  -1.63   -0.677   5.93   -6.63  14.4     21
-# ℹ 3 more variables: skew &lt;dbl&gt;, kurtosis &lt;dbl&gt;, se &lt;dbl&gt;</code></pre>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kbl</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">vars</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">n</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">median</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">trimmed</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mad</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">min</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">max</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">range</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">skew</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">kurtosis</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">se</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">FMPS_total</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">60.53</td>
+<td style="text-align: right;">16.83</td>
+<td style="text-align: right;">60.00</td>
+<td style="text-align: right;">60.11</td>
+<td style="text-align: right;">17.79</td>
+<td style="text-align: right;">24.00</td>
+<td style="text-align: right;">110.00</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.56</td>
+<td style="text-align: right;">0.74</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SELF_C</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">2.81</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">2.73</td>
+<td style="text-align: right;">2.80</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">5.00</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.50</td>
+<td style="text-align: right;">0.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DASS_Depres</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">13.63</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: right;">12.00</td>
+<td style="text-align: right;">12.95</td>
+<td style="text-align: right;">5.93</td>
+<td style="text-align: right;">7.00</td>
+<td style="text-align: right;">28.00</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">-0.51</td>
+<td style="text-align: right;">0.26</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DASS_Anx</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">12.31</td>
+<td style="text-align: right;">5.20</td>
+<td style="text-align: right;">11.00</td>
+<td style="text-align: right;">11.56</td>
+<td style="text-align: right;">4.45</td>
+<td style="text-align: right;">7.00</td>
+<td style="text-align: right;">28.00</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">1.06</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">0.23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DASS_Stress</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">15.31</td>
+<td style="text-align: right;">5.67</td>
+<td style="text-align: right;">15.00</td>
+<td style="text-align: right;">15.01</td>
+<td style="text-align: right;">5.93</td>
+<td style="text-align: right;">7.00</td>
+<td style="text-align: right;">28.00</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: right;">-0.87</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">FMPS_Av</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">16.83</td>
+<td style="text-align: right;">-0.53</td>
+<td style="text-align: right;">-0.42</td>
+<td style="text-align: right;">17.79</td>
+<td style="text-align: right;">-36.53</td>
+<td style="text-align: right;">49.47</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">-0.56</td>
+<td style="text-align: right;">0.74</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SELF_C_Av</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">0.77</td>
+<td style="text-align: right;">-0.08</td>
+<td style="text-align: right;">-0.01</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">-1.81</td>
+<td style="text-align: right;">2.19</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">-0.50</td>
+<td style="text-align: right;">0.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DASS_D_Av</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">515</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: right;">6.00</td>
+<td style="text-align: right;">-1.63</td>
+<td style="text-align: right;">-0.68</td>
+<td style="text-align: right;">5.93</td>
+<td style="text-align: right;">-6.63</td>
+<td style="text-align: right;">14.37</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">-0.51</td>
+<td style="text-align: right;">0.26</td>
+</tr>
+</tbody>
+</table>
+
+
 </div>
 </div>
 </section>
@@ -329,12 +480,12 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 <h2 class="anchored" data-anchor-id="missing-values-na">3. Missing values (NA)</h2>
 <p>Remove NA values from score and compute the mean of the cleaned vector.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(df<span class="sc">$</span>FMPS_total))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">is.na</span>(df<span class="sc">$</span>FMPS_total))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>df_noNA <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(FMPS_total)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(df) <span class="sc">-</span> <span class="fu">nrow</span>(df_noNA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df_noNA <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(FMPS_total)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(df) <span class="sc">-</span> <span class="fu">nrow</span>(df_noNA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
@@ -345,20 +496,20 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 <p>For categorical variables we would use table() and prop.table(). Here we artificially convert scores into categories:</p>
 <p>Convert scores into three groups (your own cut points) and compute their proportions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df_cat <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">level =</span> <span class="fu">case_when</span>(</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    FMPS_total <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    FMPS_total <span class="sc">&lt;</span> <span class="dv">60</span> <span class="sc">~</span> <span class="st">"Medium"</span>,</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"High"</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(df_cat<span class="sc">$</span>level)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_cat <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">level =</span> <span class="fu">case_when</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    FMPS_total <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">"Low"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    FMPS_total <span class="sc">&lt;</span> <span class="dv">60</span> <span class="sc">~</span> <span class="st">"Medium"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"High"</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(df_cat<span class="sc">$</span>level)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
   High    Low Medium 
    264     11    240 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(df_cat<span class="sc">$</span>level)) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(df_cat<span class="sc">$</span>level)) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
   High    Low Medium 
@@ -370,9 +521,9 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 <h2 class="anchored" data-anchor-id="random-numbers-set.seed">5. Random numbers &amp; set.seed()</h2>
 <p>Generate 20 random values from a normal distribution with mean 70 and sd 15.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">50</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="at">mean =</span> <span class="dv">50</span>, <span class="at">sd =</span> <span class="dv">10</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 63.70958 44.35302 53.63128 56.32863 54.04268 48.93875</code></pre>
 </div>
@@ -384,10 +535,10 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 <p>Not a hypothesis test — just a visual check.</p>
 <p>Inspect the histogram and Q-Q plot. Does the distribution look roughly normal?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> FMPS_total)) <span class="sc">+</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">20</span>, <span class="at">fill =</span> <span class="st">"#5c6bc0"</span>) <span class="sc">+</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> FMPS_total)) <span class="sc">+</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">20</span>, <span class="at">fill =</span> <span class="st">"#5c6bc0"</span>) <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -395,11 +546,11 @@ $ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.88
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">sample =</span> FMPS_total)) <span class="sc">+</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>() <span class="sc">+</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">sample =</span> FMPS_total)) <span class="sc">+</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>() <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
