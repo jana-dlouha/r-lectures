@@ -26,8 +26,8 @@ ggplot(cars, aes(x = speed, y = dist)) +
 ```
 
 What to notice:
-- `ggplot(data, aes(...))` defines *what* is plotted.
-- `geom_point()` draws the points.
+* `ggplot(data, aes(...))` defines *what* is plotted.
+* `geom_point()` draws the points.
 
 ## Step 2: Improve readability of points
 
@@ -37,8 +37,8 @@ ggplot(cars, aes(speed, dist)) +
 ```
 
 Hints:
-- `size` changes point size.
-- `alpha` makes points semi-transparent (helps with overplotting).
+* `size` changes point size.
+* `alpha` makes points semi-transparent (helps with overplotting).
 
 ## Step 3: Add a smooth trend line
 
@@ -49,8 +49,8 @@ ggplot(cars, aes(speed, dist)) +
 ```
 
 Hints:
-- `geom_smooth()` adds a model-based trend.
-- `se = TRUE` shows a confidence band (gray ribbon).
+* `geom_smooth()` adds a model-based trend.
+* `se = TRUE` shows a confidence band (gray ribbon).
 
 ## Step 4: Tune the smooth (optional but closer to target)
 
@@ -61,18 +61,18 @@ ggplot(cars, aes(speed, dist)) +
 ```
 
 Notes:
-- LOESS gives a flexible curve (good for small datasets).
-- Line color and thickness are styling details.
+* LOESS gives a flexible curve (good for small datasets).
+* Line color and thickness are styling details.
 
 ## Step 5: Final polish (labels + clean theme)
 
 Hints:
-- make points a little more transparent (70%)
-- add labs and title
-  - x-axis label "Speed (mph)"
-  - y-axis label "stopping distance (ft)"
-  - plot title "Cars: speed and stopping distance"
-- set size of all text in the plot to 14 points
+* make points a little more transparent (70%)
+* add labs and title
+  + x-axis label "Speed (mph)"
+  + y-axis label "stopping distance (ft)"
+  + plot title "Cars: speed and stopping distance"
+* set size of all text in the plot to 14 points
 
 
 ```{r step5}

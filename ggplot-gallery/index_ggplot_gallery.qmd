@@ -1,0 +1,61 @@
+---
+title: "ggplot Gallery – graph replication"
+---
+
+Choose a graph and try to replicate it as accurately as possible in ggplot.
+On the task page, you will find the target image, hints, data, and the hidden solution.
+
+<div class="gallery">
+
+<div class="gallery-card">
+  <a href="plots/theme_showcase_bfi.html">
+    <img src="assets/img/theme_showcase_bfi.png"
+         alt="ggplot theme showcase">
+  </a>
+  <div class="gallery-title">ggplot Themes</div>
+  <div class="gallery-meta">Level 1 • themes</div>
+  <div class="gallery-desc">
+    One plot, many looks — compare how different ggplot themes change the presentation.
+  </div>
+</div>
+
+<div class="gallery-card">
+  <a href="plots/tuftes_principles.html">
+    <img src="assets/img/placeholder.png"
+         alt="Tufte’s principles illustrated in ggplot">
+  </a>
+  <div class="gallery-title">Tufte’s Principles</div>
+  <div class="gallery-meta">Level 1 • clarity & minimalism</div>
+  <div class="gallery-desc">
+    Demonstration of Tufte’s ideas: avoid deception, remove chartjunk, and let the data speak.
+  </div>
+</div>
+
+<div class="gallery-card">
+  <!-- Link to the rendered HTML (robust on GitHub Pages) -->
+  <a href="plots/scatter_smooth.html">
+    <!-- No leading slash => works under /r-lectures/ as well -->
+    <img src="assets/img/scatter_smooth.png" alt="Two-layer scatterplot">
+  </a>
+  <div class="gallery-title">Two-layer scatterplot</div>
+  <div class="gallery-meta">Level 1 • layers + smoothing</div>
+  <div class="gallery-desc">
+    Two-layer plot: points + a smooth trend line.
+  </div>
+</div>
+
+<div class="gallery-card">
+  <a href="plots/scatter_correlation_sat_act.html">
+    <img src="assets/img/scatter_correlation_sat_act.png"
+         alt="Correlation scatterplot (SAT Verbal vs SAT Quantitative)">
+  </a>
+  <div class="gallery-title">Scatter correlation (SAT)</div>
+  <div class="gallery-meta">Level 1 • correlation + regression</div>
+  <div class="gallery-desc">
+    Explore the relationship between SAT Verbal and SAT Quantitative scores.
+  </div>
+</div>
+
+<!-- Copy another card block for each new task -->
+
+</div>

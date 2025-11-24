@@ -127,8 +127,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../ggplot-gallery/index.html"> 
+    <a class="nav-link" href="../../ggplot-gallery/index_ggplot_gallery.html"> 
 <span class="menu-text">ggplot Gallery</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../stats/index_stats.html"> 
+<span class="menu-text">Statistics in R</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -222,7 +226,7 @@ Focus first on <em>structure</em> (layers), then on <em>style</em>.</p>
 </div>
 </div>
 </div>
-<p>What to notice: - <code>ggplot(data, aes(...))</code> defines <em>what</em> is plotted. - <code>geom_point()</code> draws the points.</p>
+<p>What to notice: * <code>ggplot(data, aes(...))</code> defines <em>what</em> is plotted. * <code>geom_point()</code> draws the points.</p>
 </section>
 <section id="step-2-improve-readability-of-points" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-improve-readability-of-points">Step 2: Improve readability of points</h2>
@@ -240,7 +244,7 @@ Focus first on <em>structure</em> (layers), then on <em>style</em>.</p>
 </div>
 </div>
 </div>
-<p>Hints: - <code>size</code> changes point size. - <code>alpha</code> makes points semi-transparent (helps with overplotting).</p>
+<p>Hints: * <code>size</code> changes point size. * <code>alpha</code> makes points semi-transparent (helps with overplotting).</p>
 </section>
 <section id="step-3-add-a-smooth-trend-line" class="level2">
 <h2 class="anchored" data-anchor-id="step-3-add-a-smooth-trend-line">Step 3: Add a smooth trend line</h2>
@@ -259,7 +263,7 @@ Focus first on <em>structure</em> (layers), then on <em>style</em>.</p>
 </div>
 </div>
 </div>
-<p>Hints: - <code>geom_smooth()</code> adds a model-based trend. - <code>se = TRUE</code> shows a confidence band (gray ribbon).</p>
+<p>Hints: * <code>geom_smooth()</code> adds a model-based trend. * <code>se = TRUE</code> shows a confidence band (gray ribbon).</p>
 </section>
 <section id="step-4-tune-the-smooth-optional-but-closer-to-target" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-tune-the-smooth-optional-but-closer-to-target">Step 4: Tune the smooth (optional but closer to target)</h2>
@@ -278,11 +282,11 @@ Focus first on <em>structure</em> (layers), then on <em>style</em>.</p>
 </div>
 </div>
 </div>
-<p>Notes: - LOESS gives a flexible curve (good for small datasets). - Line color and thickness are styling details.</p>
+<p>Notes: * LOESS gives a flexible curve (good for small datasets). * Line color and thickness are styling details.</p>
 </section>
 <section id="step-5-final-polish-labels-clean-theme" class="level2">
 <h2 class="anchored" data-anchor-id="step-5-final-polish-labels-clean-theme">Step 5: Final polish (labels + clean theme)</h2>
-<p>Hints: - make points a little more transparent (70%) - add labs and title - x-axis label “Speed (mph)” - y-axis label “stopping distance (ft)” - plot title “Cars: speed and stopping distance” - set size of all text in the plot to 14 points</p>
+<p>Hints: * make points a little more transparent (70%) * add labs and title + x-axis label “Speed (mph)” + y-axis label “stopping distance (ft)” + plot title “Cars: speed and stopping distance” * set size of all text in the plot to 14 points</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show solution</summary>

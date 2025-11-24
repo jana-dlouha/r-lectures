@@ -10,14 +10,17 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: ggplot-gallery/index.qmd
+      - href: ggplot-gallery/index_ggplot_gallery.qmd
         text: ggplot Gallery
+      - href: stats/index_stats.qmd
+        text: Statistics in R
 
 execute:
   warning: false
   message: false
   eval: true
   echo: true
+  freeze: false
 
 format:
   html:

@@ -1,0 +1,145 @@
+---
+title: "Basics: Working With Data in R"
+code-fold: false
+---
+
+# Introduction
+
+This page covers the most practical basics you need before doing any statistics
+in R:
+
+- loading data
+- exploring structure
+- handling missing values
+- descriptive statistics
+- basic tables and proportions
+- random number generation
+- checking simple distribution shapes
+
+You can use any dataset, but for this tutorial we work with:
+
+**`perfectionism_total_scores.csv`**
+Small psychological dataset with one continuous score variable.
+
+<p>
+  <a href="../assets/data/perfectionism_total_scores.csv" download>
+    Download the dataset (perfectionism_total_scores.csv)
+  </a>
+</p>
+
+```{r setup}
+library(tidyverse)
+df <- read_csv2("../assets/data/perfectionism_total_scores.csv")
+```
+
+## 1. First look at the data
+
+Understanding your dataset is the very first step. Look at the variable names
+and data types. What type is the main score variable?
+
+```{r explore}
+glimpse(df)
+summary(df)
+head(df)
+```
+
+
+## 2. Descriptive statistics
+
+Compute the mean, median, and standard deviation of the score.
+
+```{r descriptives}
+
+# Mean
+mean(df$FMPS_total, na.rm = TRUE)
+
+# Median
+median(df$FMPS_total, na.rm = TRUE)
+
+# Standard deviation
+sd(df$FMPS_total, na.rm = TRUE)
+
+# Range
+range(df$FMPS_total, na.rm = TRUE)
+
+# Quantile
+quantile(df$FMPS_total, probs = c(.25, .5, .75), na.rm = TRUE)
+
+# Or all in one table
+df %>%
+    select(FMPS_total:DASS_D_Av) %>%
+    psych::describe() %>%
+    rownames_to_column("Scale") %>%
+    as_tibble()
+
+```
+
+## 3. Missing values (NA)
+
+Remove NA values from score and compute the mean of the cleaned vector.
+
+```{r missing_values}
+sum(is.na(df$FMPS_total))
+df_noNA <- df %>% drop_na(FMPS_total)
+nrow(df) - nrow(df_noNA)
+```
+
+## 4. Frequency tables & proportions
+
+For categorical variables we would use table() and prop.table().
+Here we artificially convert scores into categories:
+
+Convert scores into three groups (your own cut points) and compute their
+proportions.
+
+```{r frequency_tables}
+df_cat <- df %>%
+  mutate(level = case_when(
+    FMPS_total < 30 ~ "Low",
+    FMPS_total < 60 ~ "Medium",
+    TRUE ~ "High"
+  ))
+
+table(df_cat$level)
+prop.table(table(df_cat$level)) %>% round(3)
+```
+
+## 5. Random numbers & set.seed()
+
+Generate 20 random values from a normal distribution with mean 70 and sd 15.
+
+```{r random_numbers}
+set.seed(42)
+x <- rnorm(100, mean = 50, sd = 10)
+head(x)
+```
+
+Why set.seed()?
+It makes randomness reproducible.
+
+## 6. Quick normality check
+
+Not a hypothesis test — just a visual check.
+
+Inspect the histogram and Q-Q plot. Does the distribution look roughly normal?
+
+```{r qqplot}
+df %>%
+  ggplot(aes(x = FMPS_total)) +
+  geom_histogram(bins = 20, fill = "#5c6bc0") +
+  theme_minimal()
+
+df %>%
+  ggplot(aes(sample = FMPS_total)) +
+  stat_qq() +
+  stat_qq_line(color = "red") +
+  theme_minimal()
+```
+
+## Take-home message
+
+- Always start with glimpse(), summary(), head()
+- Use na.rm = TRUE when needed
+- table() + prop.table() are essential for categorical summaries
+- set.seed() ensures reproducible randomness
+- Quick plots often reveal more than formal tests

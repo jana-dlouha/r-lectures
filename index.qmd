@@ -12,5 +12,7 @@ Here you will find:
 
 ## Modules
 
-- **[ggplot Gallery](ggplot-gallery/index.qmd)**
+- **[ggplot Gallery](ggplot-gallery/index_ggplot_gallery.qmd)**
   Training in reading and composing graphs in ggplot2 using the replication method.
+- **[Statistics in R](stats/index_stats.qmd)**
+  Basic statistic methods available in R.

@@ -1,0 +1,89 @@
+---
+title: "Statistics with R – practical walkthrough"
+---
+
+Learn statistics through short, focused tasks in R.
+Each topic combines explanation, hands-on code, and a foldable solution, so you can check your work step by step.
+
+<div class="gallery">
+
+<!-- Basics -->
+<div class="gallery-card">
+  <a href="topics/basics.html">
+    <img src="assets/img/placeholder.png"
+         alt="Basic data exploration in R">
+  </a>
+  <div class="gallery-title">Basic data exploration</div>
+  <div class="gallery-meta">Level 0 • essentials</div>
+  <div class="gallery-desc">
+    Mean, median, SD, missing values, frequency tables, and random simulation basics.
+  </div>
+</div>
+
+
+<!-- Correlation -->
+<div class="gallery-card">
+  <a href="topics/correlation.html">
+    <img src="assets/img/placeholder.png"
+         alt="Correlation in R">
+  </a>
+  <div class="gallery-title">Correlation</div>
+  <div class="gallery-meta">Level 1 • relationships between variables</div>
+  <div class="gallery-desc">
+    Compute Pearson/Spearman correlations, interpret results, and visualize relationships.
+  </div>
+</div>
+
+<!-- Regression -->
+<div class="gallery-card">
+  <a href="topics/regression.html">
+    <img src="assets/img/placeholder.png"
+         alt="Linear regression in R">
+  </a>
+  <div class="gallery-title">Linear Regression</div>
+  <div class="gallery-meta">Level 1 • prediction & interpretation</div>
+  <div class="gallery-desc">
+    Fit linear models, interpret coefficients, visualize predictions, and check model assumptions.
+  </div>
+</div>
+
+<!-- Group comparisons -->
+<div class="gallery-card">
+  <a href="topics/ttest_anova.html">
+    <img src="assets/img/placeholder.png"
+         alt="Group comparison in R">
+  </a>
+  <div class="gallery-title">Group Comparisons</div>
+  <div class="gallery-meta">Level 1 • t-tests & ANOVA</div>
+  <div class="gallery-desc">
+    Compare groups using t-tests and ANOVA, inspect effect sizes, and visualize differences.
+  </div>
+</div>
+
+<!-- Probability & simulation -->
+<div class="gallery-card">
+  <a href="topics/probability.html">
+    <img src="assets/img/placeholder.png"
+         alt="Probability & simulation in R">
+  </a>
+  <div class="gallery-title">Probability & Simulation</div>
+  <div class="gallery-meta">Level 1 • randomness & intuition</div>
+  <div class="gallery-desc">
+    Roll virtual dice, simulate events, estimate probabilities, and build intuition through code.
+  </div>
+</div>
+
+<!-- Power & sample size -->
+<div class="gallery-card">
+  <a href="topics/power_sample_size.html">
+    <img src="assets/img/placeholder.png"
+         alt="Statistical power in R">
+  </a>
+  <div class="gallery-title">Power & Sample Size</div>
+  <div class="gallery-meta">Level 1 • planning studies</div>
+  <div class="gallery-desc">
+    Understand statistical power, compute required sample sizes, and explore effect size scenarios.
+  </div>
+</div>
+
+</div>

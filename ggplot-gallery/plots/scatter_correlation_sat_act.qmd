@@ -7,9 +7,9 @@ title: "Scatterplot with correlation"
 In this task, you will recreate a correlation scatterplot using **SAT Verbal** and **SAT Quantitative** scores.  
 The aim is to practice:
 
-- mapping `x` and `y`,
-- adding layers (`geom_point()`, `geom_smooth()`),
-- interpreting a correlation annotation.
+* mapping `x` and `y`,
+* adding layers (`geom_point()`, `geom_smooth()`),
+* interpreting a correlation annotation.
 
 At the bottom of the page, you will find the **hidden full solution**.
 
@@ -17,7 +17,7 @@ At the bottom of the page, you will find the **hidden full solution**.
 
 We use the cleaned dataset `sat_act.csv` prepared earlier in `src/data_prep/sat_act.R`.
 
-```{r setup, include=TRUE, echo=FALSE}
+```{r setup}
 library(tidyverse)
 library(ggpubr)
 ```
@@ -26,8 +26,10 @@ library(ggpubr)
 
 ## Step 1: Start with a basic scatterplot
 
-```{r step1, echo=TRUE, eval=TRUE}
+```{r step1}
 df <- read_csv2("../../src/data/sat_act.csv")
+
+head(df)
 
 ggplot(df, aes(SATV, SATQ)) +
   geom_point()
@@ -37,7 +39,7 @@ ggplot(df, aes(SATV, SATQ)) +
 
 ## Step 2: Add a regression line
 
-```{r step2, echo=TRUE, eval=TRUE}
+```{r step2}
 ggplot(df, aes(SATV, SATQ)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE)
@@ -47,7 +49,7 @@ ggplot(df, aes(SATV, SATQ)) +
 
 ## Step 3: Improve readability
 
-```{r step3, echo=TRUE, eval=TRUE}
+```{r step3}
 ggplot(df, aes(SATV, SATQ)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE) +
@@ -62,11 +64,11 @@ ggplot(df, aes(SATV, SATQ)) +
 
 ## Step 4: Add the correlation annotation (optional)
 
-```{r step4, echo=TRUE, eval=TRUE}
+```{r step4}
 ggplot(df, aes(SATV, SATQ)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE) +
-  stat_cor(method = "pearson", label.x = 200, size = 6) +
+  stat_cor(method = "pearson", label.x = 200, size = 5) +
   labs(
     x = "SAT Verbal",
     y = "SAT Quantitative",
@@ -78,11 +80,11 @@ ggplot(df, aes(SATV, SATQ)) +
 
 ## Optional style improvements
 
-```{r step5, echo=TRUE, eval=TRUE}
+```{r step5}
 ggplot(df, aes(SATV, SATQ)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE) +
-  stat_cor(method = "pearson", label.x = 200, size = 6) +
+  stat_cor(method = "pearson", label.x = 200, size = 5) +
   labs(
     x = "SAT Verbal",
     y = "SAT Quantitative",

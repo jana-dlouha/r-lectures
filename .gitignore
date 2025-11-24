@@ -49,3 +49,5 @@ rsconnect/
 /.quarto/
 
 inspiration.txt
+.DS_Store
+/_freeze
