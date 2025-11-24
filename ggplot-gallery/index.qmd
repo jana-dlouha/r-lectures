@@ -11,7 +11,7 @@ On the task page, you will find the target image, hints, data, and the hidden so
   <!-- Link to the rendered HTML (robust on GitHub Pages) -->
   <a href="plots/scatter_smooth.html">
     <!-- No leading slash => works under /r-lectures/ as well -->
-    <img src="_assets/img/scatter_smooth.png" alt="Two-layer scatterplot">
+    <img src="assets/img/scatter_smooth.png" alt="Two-layer scatterplot">
   </a>
   <div class="gallery-title">Two-layer scatterplot</div>
   <div class="gallery-meta">Level 1 • layers + smoothing</div>
@@ -22,7 +22,7 @@ On the task page, you will find the target image, hints, data, and the hidden so
 
 <div class="gallery-card">
   <a href="plots/scatter_correlation_sat_act.html">
-    <img src="_assets/img/scatter_correlation_sat_act.png"
+    <img src="assets/img/scatter_correlation_sat_act.png"
          alt="Correlation scatterplot (SAT Verbal vs SAT Quantitative)">
   </a>
   <div class="gallery-title">Scatter correlation (SAT)</div>

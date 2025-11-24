@@ -95,29 +95,3 @@ ggplot(df, aes(SATV, SATQ)) +
   )
 ```
 
----
-
-## Final target graph
-
-![](_assets/img/scatter_correlation_sat_act.png)
-
----
-
-## Hidden solution
-
-```{r solution, echo=FALSE, eval=TRUE}
-ggplot(df, aes(SATV, SATQ)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = TRUE, linewidth = 1.1) +
-  stat_cor(method = "pearson", label.x = 200, size = 6) +
-  labs(
-    x = "SAT Verbal",
-    y = "SAT Quantitative",
-    title = "SAT Verbal vs SAT Quantitative"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    panel.grid.minor = element_blank()
-  )
-```

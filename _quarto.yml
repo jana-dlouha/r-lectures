@@ -2,7 +2,7 @@ project:
   type: website
   output-dir: docs
   resources:
-    - _shared/
+    - shared/
 
 website:
   title: "R Lectures"
@@ -25,4 +25,4 @@ format:
     toc: true
     code-fold: true
     code-summary: "Show solution"
-    css: "/_shared/styles.css"
+    css: "/shared/styles.css"

@@ -4,7 +4,7 @@
 # This script:
 #   • uses the built-in cars dataset (speed vs stopping distance)
 #   • builds the final target plot for the ggplot gallery task
-#   • saves a PNG into ggplot-gallery/_assets/img/
+#   • saves a PNG into ggplot-gallery/assets/img/
 # -------------------------------------------------------------------
 
 # Load packages ---------------------------------------------------------------
@@ -38,7 +38,7 @@ p <- ggplot(cars, aes(speed, dist)) +
 
 # Save target PNG for the gallery --------------------------------------------
 ggsave(
-  filename = "ggplot-gallery/_assets/img/scatter_smooth.png",
+  filename = "ggplot-gallery/assets/img/scatter_smooth.png",
   plot = p,
   width = 6, height = 6, dpi = 150
 )

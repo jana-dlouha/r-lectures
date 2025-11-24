@@ -56,20 +56,6 @@
     "text": "Optional style improvements\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 6) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  ) +\n  theme_minimal(base_size = 14) +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    panel.grid.minor = element_blank()\n  )"
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#final-target-graph",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#final-target-graph",
-    "title": "Scatterplot with correlation",
-    "section": "Final target graph",
-    "text": "Final target graph"
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#hidden-solution",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#hidden-solution",
-    "title": "Scatterplot with correlation",
-    "section": "Hidden solution",
-    "text": "Hidden solution"
-  },
-  {
     "objectID": "ggplot-gallery/index.html",
     "href": "ggplot-gallery/index.html",
     "title": "ggplot Gallery – graph replication",

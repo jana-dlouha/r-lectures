@@ -52,7 +52,7 @@ p <- ggplot(df, aes(SATV, SATQ)) +
 # Save final plot --------------------------------------------------------------
 # Saved into the gallery asset folder (PNG), ready to be used as target image
 ggsave(
-  filename = "ggplot-gallery/_assets/img/scatter_correlation_sat_act.png",
+  filename = "ggplot-gallery/assets/img/scatter_correlation_sat_act.png",
   plot = p,
   width = 6, height = 6, dpi = 150
 )
