@@ -51,3 +51,5 @@ rsconnect/
 inspiration.txt
 .DS_Store
 /_freeze
+ggplot-gallery/assets/data/english_maturity_data.csv
+stats/assets/data/english_maturity_data.csv

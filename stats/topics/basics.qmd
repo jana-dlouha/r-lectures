@@ -19,7 +19,26 @@ in R:
 You can use any dataset, but for this tutorial we work with:
 
 **`perfectionism_total_scores.csv`**
-Small psychological dataset with one continuous score variable.
+Small psychological teaching dataset containing one continuous variable: total maladaptive perfectionism score (FMPS_total).
+The data were adapted from the de-identified adult sample in Ferrari et al. (2018) and simplified for classroom use. In the original study, maladaptive perfectionism was computed as a combined score of four Frost Multidimensional Perfectionism Scale (FMPS) subscales: Concern over Mistakes, Parental Expectations, Parental Criticism, and Doubts about Actions.
+
+Original study:
+Ferrari, M., Yap, K., Scott, N., Einstein, D. A., & Ciarrochi, J. (2018). Self-compassion moderates the perfectionism and depression link in both adolescence and adulthood. PLOS ONE, 13(2), e0192022. https://doi.org/10.1371/journal.pone.0192022  ￼
+
+Questionnaires used in the original study:
+
+- Frost Multidimensional Perfectionism Scale (FMPS) — 35 items. Used to derive maladaptive perfectionism (FMPS_total).
+- Self-Compassion Scale – Short Form (SCS-SF) — 12 items. Total self-compassion score (SELF_C).
+- Depression Anxiety Stress Scales – Short Form (DASS-21) — 21 items. Subscales for depression, anxiety, and stress.
+
+Variables in our teaching file:
+- FMPS_total — total maladaptive perfectionism score (higher = more maladaptive perfectionism).
+- DASS_Depress — depression symptoms.
+- DASS_Anx — anxiety symptoms.
+- DASS_Stress — stress symptoms.
+- SELF_C — total self-compassion score.
+
+Note: The teaching dataset keeps only variables needed for introductory analyses and may differ slightly in coding/format from the original supporting files.
 
 <p>
   <a href="../assets/data/perfectionism_total_scores.csv" download>
