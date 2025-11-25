@@ -1,0 +1,127 @@
+---
+title: "Labelled scatterplot (Gapminder)"
+---
+
+This task focuses on adding readable labels to a scatterplot.  
+You will use `geom_text_repel()` from the **ggrepel** package to avoid overlaps.
+
+## Goal
+Replicate a labelled scatterplot of **GDP per capita vs. life expectancy** for European countries in 2007.  
+Focus first on *structure* (layers), then on *label readability*, and only at the end on *style*.
+
+## Data
+We use a prepared Gapminder subset saved as `src/data/gapminder.csv`.  
+If you want to reproduce the file, see `ggplot-gallery/plot_prep/gapminder_labeled_scatter.R`.
+
+<p>
+  <a href="../assets/data/gapminder.csv" download>
+    Download the dataset (gapminder.csv)
+  </a>
+</p>
+
+```{r setup}
+library(tidyverse)
+library(ggrepel)
+library(gapminder)
+```
+
+```{r data}
+# Load prepared dataset
+gapminder::gapminder
+
+# Keep a readable subset for labelling
+df <- gapminder %>%
+  filter(year == 2007, continent == "Europe") %>%
+  drop_na()
+```
+
+## Step 1: Basic scatterplot
+
+```{r step1}
+ggplot(df, aes(gdpPercap, lifeExp)) +
+  geom_point()
+```
+
+What to notice:
+- `aes(x, y)` maps variables to axes.
+- `geom_point()` draws the observations.
+
+## Step 2: Make points easier to read
+
+```{r step2}
+ggplot(df, aes(gdpPercap, lifeExp)) +
+  geom_point(size = 2, alpha = 0.8)
+```
+
+Hints:
+- `size` increases visibility.
+- `alpha` adds transparency (helps if points overlap).
+
+## Step 3: Add country labels (ggrepel)
+
+```{r step3}
+ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_text_repel(size = 3)
+```
+
+Hints:
+- `label = country` tells ggplot what text to show.
+- `geom_text_repel()` spreads labels so they do not collide.
+
+## Step 4: Improve the x-axis scale
+
+```{r step4}
+ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_text_repel(size = 3) +
+  scale_x_log10()
+```
+
+Notes:
+- GDP per capita is right‑skewed.
+- A log scale makes distances more meaningful.
+
+## Step 5: Final polish (labels + clean theme)
+
+Hints:
+- add informative axis labels and title  
+- keep all text at 14 pt  
+- use a minimal theme for readability
+
+```{r step5}
+ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_text_repel(size = 3, max.overlaps = Inf) +
+  scale_x_log10() +
+  labs(
+    x = "GDP per capita (log scale)",
+    y = "Life expectancy (years)",
+    title = "Gapminder 2007: Europe",
+    subtitle = "Each point is one country"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+---
+
+## Hidden solution
+
+```{r solution}
+ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_text_repel(size = 3, max.overlaps = Inf) +
+  scale_x_log10() +
+  labs(
+    x = "GDP per capita (log scale)",
+    y = "Life expectancy (years)",
+    title = "Gapminder 2007: Europe",
+    subtitle = "Each point is one country"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+## Extra challenges
+1. Label only the **5 richest** and **5 poorest** countries.
+2. Color points by life expectancy.
+3. Try a different continent or a different year.

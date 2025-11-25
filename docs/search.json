@@ -14,25 +14,123 @@
     "text": "Modules\n\nggplot Gallery Training in reading and composing graphs in ggplot2 using the replication method.\nStatistics in R Basic statistic methods available in R."
   },
   {
-    "objectID": "ggplot-gallery/plots/tuftes_principles.html",
-    "href": "ggplot-gallery/plots/tuftes_principles.html",
-    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "title": "Scatterplot with correlation",
     "section": "",
-    "text": "This page is a small, visual reminder of a few ideas from Edward Tufte:\nWe’ll illustrate that with a simple example from the gapminder dataset.\nlibrary(tidyverse)\nlibrary(gapminder)"
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
   },
   {
-    "objectID": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
-    "href": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
-    "title": "Tufte’s principles (and how to avoid lying with axes)",
-    "section": "Example: life expectancy in Peru before 1980",
-    "text": "Example: life expectancy in Peru before 1980\n\nlife_exp_pre80 &lt;- gapminder %&gt;%\n  filter(country == \"Peru\", year &lt; 1980)\n\n\n1) A misleading plot (truncated y‑axis)\nThis plot zooms the y‑axis to a narrow range.\nIt makes the improvement in life expectancy look much larger than it really is.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(43.9, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 4.5\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\n2) The honest version (axis starts at zero)\nSame data, same geom, same colors.\nOnly the axis range is fixed so the magnitude is not exaggerated.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(0, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 1.3\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\nQuick check (the real ratio)\n\nmax_life_exp &lt;- life_exp_pre80 %&gt;% slice_max(lifeExp)\nmin_life_exp &lt;- life_exp_pre80 %&gt;% slice_min(lifeExp)\n\nmax_life_exp$lifeExp / min_life_exp$lifeExp\n\n[1] 1.331306\n\n\n\n\n3) A deliberately “bad” example (what not to do)\nThis plot is purposely overloaded. It demonstrates the classic mistakes that Tufte warns about: too much background, heavy gridlines, loud colors, and no clear message.\nGoal: Help students see how easily a plot can become cluttered.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme(\n            panel.grid.major = element_line(size = 1, linetype = 'dashed', colour = \"green\"),\n            panel.grid.minor = element_line(size = 1, linetype = 'dashed', colour = \"blue\"),\n            panel.background = element_rect(fill = \"red\", colour = \"blue\"),\n            plot.background = element_rect(fill = \"green\")\n        )\n\n\n\n\n\n\n\n\n\n\n4) A cleaned-up reference version\nSame data, but now the plot is readable. The layout is simple, the background is neutral, and unnecessary visual elements are removed.\nGoal: Show the transition from visual noise to a reasonable starting point.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme_light() +\n        theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n5) Highlighting one meaningful value (Tufte-ish)\nHere we finally work with visual hierarchy: one bar (1967) is emphasized while everything else fades into the background. No gridlines, minimal text, and clear focus on the information that matters.\nGoal: Demonstrate that a minimalist plot can be far more informative than a decorative one.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = (year == 1967))) +\n        geom_col() +\n        theme_minimal() +\n        theme(\n            axis.text.y = element_blank(),\n            legend.position = \"none\") +\n    scale_fill_manual(values = c(\"gray\", \"red\")) +\n    geom_text(\n    aes(x = year, y = lifeExp, label = round(lifeExp)), nudge_y = 0.25, size = 7, vjust = 2, color = \"black\")"
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "title": "Scatterplot with correlation",
+    "section": "",
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
   },
   {
-    "objectID": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
-    "href": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
-    "title": "Tufte’s principles (and how to avoid lying with axes)",
-    "section": "Take-home message",
-    "text": "Take-home message\n\nIf your axis does not start at zero, explain why and check that it does not distort the story.\nPrefer clarity over decoration.\nThe “best” theme is the one that makes the data the easiest to read.\nHighlight only what carries meaning. Silence around the important signal helps it stand out."
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "title": "Scatterplot with correlation",
+    "section": "Data",
+    "text": "Data\nWe use the cleaned dataset sat_act.csv prepared earlier in src/data_prep/sat_act.R.\n\n\nShow solution\nlibrary(tidyverse)\nlibrary(ggpubr)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Scatterplot with correlation",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\ndf &lt;- read_csv2(\"../../src/data/sat_act.csv\")\n\nhead(df)\n\n\n# A tibble: 6 × 7\n     id gender education   age   ACT  SATV  SATQ\n  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1     1 female         3    19    24   500   500\n2     2 female         3    23    35   600   500\n3     3 female         3    20    21   480   470\n4     4 male           4    27    26   550   520\n5     5 male           2    33    31   600   550\n6     6 male           5    26    28   640   640\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "title": "Scatterplot with correlation",
+    "section": "Step 2: Add a regression line",
+    "text": "Step 2: Add a regression line\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "title": "Scatterplot with correlation",
+    "section": "Step 3: Improve readability",
+    "text": "Step 3: Improve readability\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "title": "Scatterplot with correlation",
+    "section": "Step 4: Add the correlation annotation (optional)",
+    "text": "Step 4: Add the correlation annotation (optional)\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "title": "Scatterplot with correlation",
+    "section": "Optional style improvements",
+    "text": "Optional style improvements\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  ) +\n  theme_minimal(base_size = 14) +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    panel.grid.minor = element_blank()\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html",
+    "href": "ggplot-gallery/plots/scatter_smooth.html",
+    "title": "Two-layer scatterplot",
+    "section": "",
+    "text": "This task trains the basic ggplot workflow: mapping aesthetics, adding layers, and reading a smooth trend."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "title": "Two-layer scatterplot",
+    "section": "Goal",
+    "text": "Goal\nReplicate a scatterplot with a smooth trend line.\nFocus first on structure (layers), then on style."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
+    "title": "Two-layer scatterplot",
+    "section": "Load and preview data",
+    "text": "Load and preview data\nWe will use the built-in cars dataset (speed vs. stopping distance) from the tidyverse package\n\n\nShow solution\nlibrary(tidyverse)\n\nhead(cars)\n\n\n  speed dist\n1     4    2\n2     4   10\n3     7    4\n4     7   22\n5     8   16\n6     9   10"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Two-layer scatterplot",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\nggplot(cars, aes(x = speed, y = dist)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: * ggplot(data, aes(...)) defines what is plotted. * geom_point() draws the points."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "title": "Two-layer scatterplot",
+    "section": "Step 2: Improve readability of points",
+    "text": "Step 2: Improve readability of points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2)\n\n\n\n\n\n\n\n\n\nHints: * size changes point size. * alpha makes points semi-transparent (helps with overplotting)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "title": "Two-layer scatterplot",
+    "section": "Step 3: Add a smooth trend line",
+    "text": "Step 3: Add a smooth trend line\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(se = TRUE)\n\n\n\n\n\n\n\n\n\nHints: * geom_smooth() adds a model-based trend. * se = TRUE shows a confidence band (gray ribbon)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "title": "Two-layer scatterplot",
+    "section": "Step 4: Tune the smooth (optional but closer to target)",
+    "text": "Step 4: Tune the smooth (optional but closer to target)\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(method = \"loess\", se = TRUE)\n\n\n\n\n\n\n\n\n\nNotes: * LOESS gives a flexible curve (good for small datasets). * Line color and thickness are styling details."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "title": "Two-layer scatterplot",
+    "section": "Step 5: Final polish (labels + clean theme)",
+    "text": "Step 5: Final polish (labels + clean theme)\nHints: * make points a little more transparent (70%) * add labs and title + x-axis label “Speed (mph)” + y-axis label “stopping distance (ft)” + plot title “Cars: speed and stopping distance” * set size of all text in the plot to 14 points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2, alpha = 0.7) +\n  geom_smooth(method = \"loess\", se = TRUE) +\n  labs(\n    x = \"Speed (mph)\",\n    y = \"Stopping distance (ft)\",\n    title = \"Cars: speed and stopping distance\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "title": "Two-layer scatterplot",
+    "section": "Extra challenges",
+    "text": "Extra challenges\n\nRemove the gray confidence band.\nTry a linear trend instead of LOESS.\nChange the point color and add a matching smooth line."
   },
   {
     "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html",
@@ -116,126 +214,161 @@
     "href": "ggplot-gallery/index_ggplot_gallery.html",
     "title": "ggplot Gallery – graph replication",
     "section": "",
-    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n\n  \n\nggplot Themes\n\n\nLevel 1 • themes\n\n\nOne plot, many looks — compare how different ggplot themes change the presentation.\n\n\n\n  \n\nTufte’s Principles\n\n\nLevel 1 • clarity & minimalism\n\n\nDemonstration of Tufte’s ideas: avoid deception, remove chartjunk, and let the data speak.\n\n\n\n    \n\nTwo-layer scatterplot\n\n\nLevel 1 • layers + smoothing\n\n\nTwo-layer plot: points + a smooth trend line.\n\n\n\n  \n\nScatter correlation (SAT)\n\n\nLevel 1 • correlation + regression\n\n\nExplore the relationship between SAT Verbal and SAT Quantitative scores."
+    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n\n  \n\nggplot Themes\n\n\nLevel 1 • themes\n\n\nOne plot, many looks — compare how different ggplot themes change the presentation.\n\n\n\n  \n\nTufte’s Principles\n\n\nLevel 1 • clarity & minimalism\n\n\nDemonstration of Tufte’s ideas: avoid deception, remove chartjunk, and let the data speak.\n\n\n\n    \n\nTwo-layer scatterplot\n\n\nLevel 1 • layers + smoothing\n\n\nTwo-layer plot: points + a smooth trend line.\n\n\n\n  \n\nScatter correlation (SAT)\n\n\nLevel 1 • correlation + regression\n\n\nExplore the relationship between SAT Verbal and SAT Quantitative scores.\n\n\n\n  \n\nIce-cream × Performance\n\n\nLevel 2 • grouping + regression\n\n\nMultilevel scatterplot: explore how puzzle performance and video time relate\nacross ice-cream preference groups.\n\n\n\n  \n\nLabelled scatterplot (Gapminder)\n\n\nLevel 2 • labels with ggrepel\n\n\nAdd readable country labels to a GDP–life expectancy scatterplot using\n&lt;code&gt;geom_text_repel()&lt;/code&gt;."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html",
-    "href": "ggplot-gallery/plots/scatter_smooth.html",
-    "title": "Two-layer scatterplot",
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html",
+    "title": "Multilevel scatterplot (Ice cream groups)",
     "section": "",
-    "text": "This task trains the basic ggplot workflow: mapping aesthetics, adding layers, and reading a smooth trend."
+    "text": "This task extends the basic scatterplot by adding grouped aesthetics (color + shape), separate regression lines per group, and group‑wise correlation labels."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#goal",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#goal",
-    "title": "Two-layer scatterplot",
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#goal",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#goal",
+    "title": "Multilevel scatterplot (Ice cream groups)",
     "section": "Goal",
-    "text": "Goal\nReplicate a scatterplot with a smooth trend line.\nFocus first on structure (layers), then on style."
+    "text": "Goal\nReplicate a scatterplot of video time vs. puzzle score, split by ice‑cream group.\nFocus first on structure (layers), then on style."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
-    "title": "Two-layer scatterplot",
-    "section": "Load and preview data",
-    "text": "Load and preview data\nWe will use the built-in cars dataset (speed vs. stopping distance) from the tidyverse package\n\n\nShow solution\nlibrary(tidyverse)\n\nhead(cars)\n\n\n  speed dist\n1     4    2\n2     4   10\n3     7    4\n4     7   22\n5     8   16\n6     9   10"
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
-    "title": "Two-layer scatterplot",
-    "section": "Step 1: Start with a basic scatterplot",
-    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\nggplot(cars, aes(x = speed, y = dist)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: * ggplot(data, aes(...)) defines what is plotted. * geom_point() draws the points."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
-    "title": "Two-layer scatterplot",
-    "section": "Step 2: Improve readability of points",
-    "text": "Step 2: Improve readability of points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2)\n\n\n\n\n\n\n\n\n\nHints: * size changes point size. * alpha makes points semi-transparent (helps with overplotting)."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
-    "title": "Two-layer scatterplot",
-    "section": "Step 3: Add a smooth trend line",
-    "text": "Step 3: Add a smooth trend line\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(se = TRUE)\n\n\n\n\n\n\n\n\n\nHints: * geom_smooth() adds a model-based trend. * se = TRUE shows a confidence band (gray ribbon)."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
-    "title": "Two-layer scatterplot",
-    "section": "Step 4: Tune the smooth (optional but closer to target)",
-    "text": "Step 4: Tune the smooth (optional but closer to target)\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(method = \"loess\", se = TRUE)\n\n\n\n\n\n\n\n\n\nNotes: * LOESS gives a flexible curve (good for small datasets). * Line color and thickness are styling details."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
-    "title": "Two-layer scatterplot",
-    "section": "Step 5: Final polish (labels + clean theme)",
-    "text": "Step 5: Final polish (labels + clean theme)\nHints: * make points a little more transparent (70%) * add labs and title + x-axis label “Speed (mph)” + y-axis label “stopping distance (ft)” + plot title “Cars: speed and stopping distance” * set size of all text in the plot to 14 points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2, alpha = 0.7) +\n  geom_smooth(method = \"loess\", se = TRUE) +\n  labs(\n    x = \"Speed (mph)\",\n    y = \"Stopping distance (ft)\",\n    title = \"Cars: speed and stopping distance\"\n  ) +\n  theme_minimal(base_size = 14)"
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
-    "href": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
-    "title": "Two-layer scatterplot",
-    "section": "Extra challenges",
-    "text": "Extra challenges\n\nRemove the gray confidence band.\nTry a linear trend instead of LOESS.\nChange the point color and add a matching smooth line."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
-    "title": "Scatterplot with correlation",
-    "section": "",
-    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
-    "title": "Scatterplot with correlation",
-    "section": "",
-    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
-  },
-  {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
-    "title": "Scatterplot with correlation",
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#data",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#data",
+    "title": "Multilevel scatterplot (Ice cream groups)",
     "section": "Data",
-    "text": "Data\nWe use the cleaned dataset sat_act.csv prepared earlier in src/data_prep/sat_act.R.\n\n\nShow solution\nlibrary(tidyverse)\nlibrary(ggpubr)"
+    "text": "Data\nWe use a small teaching dataset ice_cream.csv with:\n\nvideo – time spent watching a video (continuous)\npuzzle – puzzle score (continuous)\nice_cream – experimental group (three levels)\nfemale – binary gender indicator (0/1; not needed here)\n\nThe original dataset comes from the University of Sheffield teaching materials and was lightly cleaned/simplified for classroom use.\n\n Download the dataset (ice_cream.csv)"
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
-    "title": "Scatterplot with correlation",
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Multilevel scatterplot (Ice cream groups)",
     "section": "Step 1: Start with a basic scatterplot",
-    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\ndf &lt;- read_csv2(\"../../src/data/sat_act.csv\")\n\nhead(df)\n\n\n# A tibble: 6 × 7\n     id gender education   age   ACT  SATV  SATQ\n  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1     1 female         3    19    24   500   500\n2     2 female         3    23    35   600   500\n3     3 female         3    20    21   480   470\n4     4 male           4    27    26   550   520\n5     5 male           2    33    31   600   550\n6     6 male           5    26    28   640   640\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point()"
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\nggplot(icecream, aes(x = video, y = puzzle)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: - video goes on the x‑axis, puzzle on the y‑axis. - geom_point() draws one dot per person."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
-    "title": "Scatterplot with correlation",
-    "section": "Step 2: Add a regression line",
-    "text": "Step 2: Add a regression line\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE)"
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-2-map-groups-to-color-and-shape",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-2-map-groups-to-color-and-shape",
+    "title": "Multilevel scatterplot (Ice cream groups)",
+    "section": "Step 2: Map groups to color and shape",
+    "text": "Step 2: Map groups to color and shape\n\n\nShow solution\nggplot(icecream, aes(video, puzzle)) +\n  geom_point(aes(color = factor(ice_cream),\n                 shape = factor(ice_cream)))\n\n\n\n\n\n\n\n\n\nHints: - Turn ice_cream into a factor for grouped aesthetics. - Color + shape makes groups readable even in grayscale."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
-    "title": "Scatterplot with correlation",
-    "section": "Step 3: Improve readability",
-    "text": "Step 3: Improve readability\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-3-add-regression-lines-per-group",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-3-add-regression-lines-per-group",
+    "title": "Multilevel scatterplot (Ice cream groups)",
+    "section": "Step 3: Add regression lines per group",
+    "text": "Step 3: Add regression lines per group\n\n\nShow solution\nggplot(icecream, aes(video, puzzle)) +\n  geom_point(aes(color = factor(ice_cream),\n                 shape = factor(ice_cream))) +\n  geom_smooth(aes(color = factor(ice_cream)),\n              method = \"lm\",\n              se = FALSE)\n\n\n\n\n\n\n\n\n\nHints: - method = \"lm\" gives a straight regression line. - se = FALSE hides the confidence band so the plot stays clean."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
-    "title": "Scatterplot with correlation",
-    "section": "Step 4: Add the correlation annotation (optional)",
-    "text": "Step 4: Add the correlation annotation (optional)\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-4-add-groupwise-correlations-optional",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-4-add-groupwise-correlations-optional",
+    "title": "Multilevel scatterplot (Ice cream groups)",
+    "section": "Step 4: Add group‑wise correlations (optional)",
+    "text": "Step 4: Add group‑wise correlations (optional)\n\n\nShow solution\nggplot(icecream, aes(video, puzzle)) +\n  geom_point(aes(color = factor(ice_cream),\n                 shape = factor(ice_cream))) +\n  geom_smooth(aes(color = factor(ice_cream)),\n              method = \"lm\",\n              se = FALSE) +\n  stat_cor(aes(color = factor(ice_cream)),\n           method = \"pearson\",\n           label.x.npc = \"left\",\n           label.y.npc = \"top\",\n           size = 4)\n\n\n\n\n\n\n\n\n\nHints: - stat_cor() computes Pearson \\(r\\) separately for each group. - label.x.npc / label.y.npc place labels using plot‑relative coordinates."
   },
   {
-    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
-    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
-    "title": "Scatterplot with correlation",
-    "section": "Optional style improvements",
-    "text": "Optional style improvements\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  ) +\n  theme_minimal(base_size = 14) +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    panel.grid.minor = element_blank()\n  )"
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-5-final-polish-manual-palette-clean-theme",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#step-5-final-polish-manual-palette-clean-theme",
+    "title": "Multilevel scatterplot (Ice cream groups)",
+    "section": "Step 5: Final polish (manual palette + clean theme)",
+    "text": "Step 5: Final polish (manual palette + clean theme)\nHints: - Use a consistent palette for points and lines. - Make the legend title informative. - Set base text size to 14 points.\n\n\nShow solution\nggplot(icecream, aes(video, puzzle)) +\n  geom_point(aes(color = factor(ice_cream),\n                 shape = factor(ice_cream)),\n             size = 2) +\n  geom_smooth(aes(color = factor(ice_cream),\n                  fill  = factor(ice_cream)),\n              method = \"lm\",\n              se = FALSE,\n              linewidth = 1) +\n  stat_cor(aes(color = factor(ice_cream)),\n           method = \"pearson\",\n           label.x.npc = \"left\",\n           label.y.npc = \"top\",\n           size = 4) +\n  scale_color_manual(\n    name = \"Ice cream group\",\n    values = c(\"4\" = \"#00AFBB\", \"2\" = \"#E7B800\", \"1\" = \"#FC4E07\")\n  ) +\n  scale_fill_manual(\n    name = \"Ice cream group\",\n    values = c(\"4\" = \"#00AFBB\", \"2\" = \"#E7B800\", \"1\" = \"#FC4E07\")\n  ) +\n  labs(\n    x = \"Video time\",\n    y = \"Puzzle score\",\n    title = \"Video time vs. puzzle score by ice‑cream group\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/icecream_multilevel_scatter.html#extra-challenges",
+    "href": "ggplot-gallery/plots/icecream_multilevel_scatter.html#extra-challenges",
+    "title": "Multilevel scatterplot (Ice cream groups)",
+    "section": "Extra challenges",
+    "text": "Extra challenges\n\nAdd semi‑transparency to points to reduce overplotting.\nTry LOESS instead of a linear trend.\nFacet the plot by gender (female) and compare patterns."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html",
+    "href": "ggplot-gallery/plots/tuftes_principles.html",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "",
+    "text": "This page is a small, visual reminder of a few ideas from Edward Tufte:\nWe’ll illustrate that with a simple example from the gapminder dataset.\nlibrary(tidyverse)\nlibrary(gapminder)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
+    "href": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "Example: life expectancy in Peru before 1980",
+    "text": "Example: life expectancy in Peru before 1980\n\nlife_exp_pre80 &lt;- gapminder %&gt;%\n  filter(country == \"Peru\", year &lt; 1980)\n\n\n1) A misleading plot (truncated y‑axis)\nThis plot zooms the y‑axis to a narrow range.\nIt makes the improvement in life expectancy look much larger than it really is.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(43.9, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 4.5\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\n2) The honest version (axis starts at zero)\nSame data, same geom, same colors.\nOnly the axis range is fixed so the magnitude is not exaggerated.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(0, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 1.3\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\nQuick check (the real ratio)\n\nmax_life_exp &lt;- life_exp_pre80 %&gt;% slice_max(lifeExp)\nmin_life_exp &lt;- life_exp_pre80 %&gt;% slice_min(lifeExp)\n\nmax_life_exp$lifeExp / min_life_exp$lifeExp\n\n[1] 1.331306\n\n\n\n\n3) A deliberately “bad” example (what not to do)\nThis plot is purposely overloaded. It demonstrates the classic mistakes that Tufte warns about: too much background, heavy gridlines, loud colors, and no clear message.\nGoal: Help students see how easily a plot can become cluttered.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme(\n            panel.grid.major = element_line(size = 1, linetype = 'dashed', colour = \"green\"),\n            panel.grid.minor = element_line(size = 1, linetype = 'dashed', colour = \"blue\"),\n            panel.background = element_rect(fill = \"red\", colour = \"blue\"),\n            plot.background = element_rect(fill = \"green\")\n        )\n\n\n\n\n\n\n\n\n\n\n4) A cleaned-up reference version\nSame data, but now the plot is readable. The layout is simple, the background is neutral, and unnecessary visual elements are removed.\nGoal: Show the transition from visual noise to a reasonable starting point.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme_light() +\n        theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n5) Highlighting one meaningful value (Tufte-ish)\nHere we finally work with visual hierarchy: one bar (1967) is emphasized while everything else fades into the background. No gridlines, minimal text, and clear focus on the information that matters.\nGoal: Demonstrate that a minimalist plot can be far more informative than a decorative one.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = (year == 1967))) +\n        geom_col() +\n        theme_minimal() +\n        theme(\n            axis.text.y = element_blank(),\n            legend.position = \"none\") +\n    scale_fill_manual(values = c(\"gray\", \"red\")) +\n    geom_text(\n    aes(x = year, y = lifeExp, label = round(lifeExp)), nudge_y = 0.25, size = 7, vjust = 2, color = \"black\")"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
+    "href": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "Take-home message",
+    "text": "Take-home message\n\nIf your axis does not start at zero, explain why and check that it does not distort the story.\nPrefer clarity over decoration.\nThe “best” theme is the one that makes the data the easiest to read.\nHighlight only what carries meaning. Silence around the important signal helps it stand out."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "",
+    "text": "This task focuses on adding readable labels to a scatterplot.\nYou will use geom_text_repel() from the ggrepel package to avoid overlaps."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#goal",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#goal",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Goal",
+    "text": "Goal\nReplicate a labelled scatterplot of GDP per capita vs. life expectancy for European countries in 2007.\nFocus first on structure (layers), then on label readability, and only at the end on style."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#data",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#data",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Data",
+    "text": "Data\nWe use a prepared Gapminder subset saved as src/data/gapminder.csv.\nIf you want to reproduce the file, see ggplot-gallery/plot_prep/gapminder_labeled_scatter.R.\n\n Download the dataset (gapminder.csv) \n\n\n\nShow solution\nlibrary(tidyverse)\nlibrary(ggrepel)\nlibrary(gapminder)\n\n\n\n\nShow solution\n# Load prepared dataset\ngapminder::gapminder\n\n\n# A tibble: 1,704 × 6\n   country     continent  year lifeExp      pop gdpPercap\n   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;\n 1 Afghanistan Asia       1952    28.8  8425333      779.\n 2 Afghanistan Asia       1957    30.3  9240934      821.\n 3 Afghanistan Asia       1962    32.0 10267083      853.\n 4 Afghanistan Asia       1967    34.0 11537966      836.\n 5 Afghanistan Asia       1972    36.1 13079460      740.\n 6 Afghanistan Asia       1977    38.4 14880372      786.\n 7 Afghanistan Asia       1982    39.9 12881816      978.\n 8 Afghanistan Asia       1987    40.8 13867957      852.\n 9 Afghanistan Asia       1992    41.7 16317921      649.\n10 Afghanistan Asia       1997    41.8 22227415      635.\n# ℹ 1,694 more rows\n\n\nShow solution\n# Keep a readable subset for labelling\ndf &lt;- gapminder %&gt;%\n  filter(year == 2007, continent == \"Europe\") %&gt;%\n  drop_na()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-1-basic-scatterplot",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-1-basic-scatterplot",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Step 1: Basic scatterplot",
+    "text": "Step 1: Basic scatterplot\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: - aes(x, y) maps variables to axes. - geom_point() draws the observations."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-2-make-points-easier-to-read",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-2-make-points-easier-to-read",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Step 2: Make points easier to read",
+    "text": "Step 2: Make points easier to read\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp)) +\n  geom_point(size = 2, alpha = 0.8)\n\n\n\n\n\n\n\n\n\nHints: - size increases visibility. - alpha adds transparency (helps if points overlap)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-3-add-country-labels-ggrepel",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-3-add-country-labels-ggrepel",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Step 3: Add country labels (ggrepel)",
+    "text": "Step 3: Add country labels (ggrepel)\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp, label = country)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text_repel(size = 3)\n\n\n\n\n\n\n\n\n\nHints: - label = country tells ggplot what text to show. - geom_text_repel() spreads labels so they do not collide."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-4-improve-the-x-axis-scale",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-4-improve-the-x-axis-scale",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Step 4: Improve the x-axis scale",
+    "text": "Step 4: Improve the x-axis scale\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp, label = country)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text_repel(size = 3) +\n  scale_x_log10()\n\n\n\n\n\n\n\n\n\nNotes: - GDP per capita is right‑skewed. - A log scale makes distances more meaningful."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-5-final-polish-labels-clean-theme",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#step-5-final-polish-labels-clean-theme",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Step 5: Final polish (labels + clean theme)",
+    "text": "Step 5: Final polish (labels + clean theme)\nHints: - add informative axis labels and title\n- keep all text at 14 pt\n- use a minimal theme for readability\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp, label = country)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text_repel(size = 3, max.overlaps = Inf) +\n  scale_x_log10() +\n  labs(\n    x = \"GDP per capita (log scale)\",\n    y = \"Life expectancy (years)\",\n    title = \"Gapminder 2007: Europe\",\n    subtitle = \"Each point is one country\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#hidden-solution",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#hidden-solution",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Hidden solution",
+    "text": "Hidden solution\n\n\nShow solution\nggplot(df, aes(gdpPercap, lifeExp, label = country)) +\n  geom_point(size = 2, alpha = 0.8) +\n  geom_text_repel(size = 3, max.overlaps = Inf) +\n  scale_x_log10() +\n  labs(\n    x = \"GDP per capita (log scale)\",\n    y = \"Life expectancy (years)\",\n    title = \"Gapminder 2007: Europe\",\n    subtitle = \"Each point is one country\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/gapminder_labeled_scatter.html#extra-challenges",
+    "href": "ggplot-gallery/plots/gapminder_labeled_scatter.html#extra-challenges",
+    "title": "Labelled scatterplot (Gapminder)",
+    "section": "Extra challenges",
+    "text": "Extra challenges\n\nLabel only the 5 richest and 5 poorest countries.\nColor points by life expectancy.\nTry a different continent or a different year."
   },
   {
     "objectID": "stats/index_stats.html",

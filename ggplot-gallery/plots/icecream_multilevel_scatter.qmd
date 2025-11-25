@@ -1,0 +1,138 @@
+---
+title: "Multilevel scatterplot (Ice cream groups)"
+---
+
+This task extends the basic scatterplot by adding **grouped aesthetics** (color + shape),
+separate regression lines per group, and group‑wise correlation labels.
+
+## Goal
+Replicate a scatterplot of **video time vs. puzzle score**, split by ice‑cream group.  
+Focus first on *structure* (layers), then on *style*.
+
+## Data
+We use a small teaching dataset `ice_cream.csv` with:
+
+- `video` – time spent watching a video (continuous)
+- `puzzle` – puzzle score (continuous)
+- `ice_cream` – experimental group (three levels)
+- `female` – binary gender indicator (0/1; not needed here)
+
+The original dataset comes from the University of Sheffield teaching materials
+and was lightly cleaned/simplified for classroom use.
+
+<p>
+  <a href="../assets/data/ice_cream.csv" download>
+    Download the dataset (ice_cream.csv)
+  </a>
+</p>
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggpubr)  # provides stat_cor()
+
+# Load prepared dataset (CSV2 uses semicolon separator)
+icecream <- read_csv("../../src/data/ice_cream.csv")
+```
+
+## Step 1: Start with a basic scatterplot
+
+```{r step1}
+ggplot(icecream, aes(x = video, y = puzzle)) +
+  geom_point()
+```
+
+What to notice:
+- `video` goes on the x‑axis, `puzzle` on the y‑axis.
+- `geom_point()` draws one dot per person.
+
+## Step 2: Map groups to color and shape
+
+```{r step2}
+ggplot(icecream, aes(video, puzzle)) +
+  geom_point(aes(color = factor(ice_cream),
+                 shape = factor(ice_cream)))
+```
+
+Hints:
+- Turn `ice_cream` into a factor for grouped aesthetics.
+- Color + shape makes groups readable even in grayscale.
+
+## Step 3: Add regression lines per group
+
+```{r step3}
+ggplot(icecream, aes(video, puzzle)) +
+  geom_point(aes(color = factor(ice_cream),
+                 shape = factor(ice_cream))) +
+  geom_smooth(aes(color = factor(ice_cream)),
+              method = "lm",
+              se = FALSE)
+```
+
+Hints:
+- `method = "lm"` gives a straight regression line.
+- `se = FALSE` hides the confidence band so the plot stays clean.
+
+## Step 4: Add group‑wise correlations (optional)
+
+```{r step4}
+ggplot(icecream, aes(video, puzzle)) +
+  geom_point(aes(color = factor(ice_cream),
+                 shape = factor(ice_cream))) +
+  geom_smooth(aes(color = factor(ice_cream)),
+              method = "lm",
+              se = FALSE) +
+  stat_cor(aes(color = factor(ice_cream)),
+           method = "pearson",
+           label.x.npc = "left",
+           label.y.npc = "top",
+           size = 4)
+```
+
+Hints:
+- `stat_cor()` computes Pearson $r$ separately for each group.
+- `label.x.npc` / `label.y.npc` place labels using plot‑relative coordinates.
+
+## Step 5: Final polish (manual palette + clean theme)
+
+Hints:
+- Use a consistent palette for points and lines.
+- Make the legend title informative.
+- Set base text size to 14 points.
+
+```{r step5}
+ggplot(icecream, aes(video, puzzle)) +
+  geom_point(aes(color = factor(ice_cream),
+                 shape = factor(ice_cream)),
+             size = 2) +
+  geom_smooth(aes(color = factor(ice_cream),
+                  fill  = factor(ice_cream)),
+              method = "lm",
+              se = FALSE,
+              linewidth = 1) +
+  stat_cor(aes(color = factor(ice_cream)),
+           method = "pearson",
+           label.x.npc = "left",
+           label.y.npc = "top",
+           size = 4) +
+  scale_color_manual(
+    name = "Ice cream group",
+    values = c("4" = "#00AFBB", "2" = "#E7B800", "1" = "#FC4E07")
+  ) +
+  scale_fill_manual(
+    name = "Ice cream group",
+    values = c("4" = "#00AFBB", "2" = "#E7B800", "1" = "#FC4E07")
+  ) +
+  labs(
+    x = "Video time",
+    y = "Puzzle score",
+    title = "Video time vs. puzzle score by ice‑cream group"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+---
+
+## Extra challenges
+1. Add semi‑transparency to points to reduce overplotting.
+2. Try LOESS instead of a linear trend.
+3. Facet the plot by gender (`female`) and compare patterns.
