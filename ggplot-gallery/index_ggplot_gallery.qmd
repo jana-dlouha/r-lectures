@@ -84,6 +84,19 @@ On the task page, you will find the target image, hints, data, and the hidden so
   </div>
 </div>
 
+<div class="gallery-card">
+  <a href="plots/correlogram.html">
+    <img src="assets/img/correlogram.png"
+         alt="Correlogram">
+  </a>
+  <div class="gallery-title">Correlogram</div>
+  <div class="gallery-meta">Level 2 • Plot correlations</div>
+  <div class="gallery-desc">
+    Easy way how to plot correlations in heatmap using
+    <code>ggcorrplot</code> package.
+  </div>
+</div>
+
 <!-- Copy another card block for each new task -->
 
 </div>

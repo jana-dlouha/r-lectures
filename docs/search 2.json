@@ -1,0 +1,303 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "R Lectures",
+    "section": "",
+    "text": "Welcome to my teaching space for R. Here you will find:"
+  },
+  {
+    "objectID": "index.html#modules",
+    "href": "index.html#modules",
+    "title": "R Lectures",
+    "section": "Modules",
+    "text": "Modules\n\nggplot Gallery Training in reading and composing graphs in ggplot2 using the replication method.\nStatistics in R Basic statistic methods available in R."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html",
+    "href": "ggplot-gallery/plots/tuftes_principles.html",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "",
+    "text": "This page is a small, visual reminder of a few ideas from Edward Tufte:\nWe’ll illustrate that with a simple example from the gapminder dataset.\nlibrary(tidyverse)\nlibrary(gapminder)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
+    "href": "ggplot-gallery/plots/tuftes_principles.html#example-life-expectancy-in-peru-before-1980",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "Example: life expectancy in Peru before 1980",
+    "text": "Example: life expectancy in Peru before 1980\n\nlife_exp_pre80 &lt;- gapminder %&gt;%\n  filter(country == \"Peru\", year &lt; 1980)\n\n\n1) A misleading plot (truncated y‑axis)\nThis plot zooms the y‑axis to a narrow range.\nIt makes the improvement in life expectancy look much larger than it really is.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(43.9, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 4.5\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\n2) The honest version (axis starts at zero)\nSame data, same geom, same colors.\nOnly the axis range is fixed so the magnitude is not exaggerated.\n\nlife_exp_pre80 %&gt;%\n  ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n  geom_col() +\n  theme_light() +\n  theme(legend.position = \"none\") +\n  coord_cartesian(ylim = c(0, 60)) +\n  geom_hline(yintercept = 43.9, color = \"red\", size = 2) +\n  geom_hline(yintercept = 58.45, color = \"red\", size = 2) +\n  geom_label(\n    aes(x = 1960, y = 58.45, fill = NULL),\n    label = \"Ratio is about 1.3\",\n    size = 10\n  )\n\n\n\n\n\n\n\n\n\n\nQuick check (the real ratio)\n\nmax_life_exp &lt;- life_exp_pre80 %&gt;% slice_max(lifeExp)\nmin_life_exp &lt;- life_exp_pre80 %&gt;% slice_min(lifeExp)\n\nmax_life_exp$lifeExp / min_life_exp$lifeExp\n\n[1] 1.331306\n\n\n\n\n3) A deliberately “bad” example (what not to do)\nThis plot is purposely overloaded. It demonstrates the classic mistakes that Tufte warns about: too much background, heavy gridlines, loud colors, and no clear message.\nGoal: Help students see how easily a plot can become cluttered.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme(\n            panel.grid.major = element_line(size = 1, linetype = 'dashed', colour = \"green\"),\n            panel.grid.minor = element_line(size = 1, linetype = 'dashed', colour = \"blue\"),\n            panel.background = element_rect(fill = \"red\", colour = \"blue\"),\n            plot.background = element_rect(fill = \"green\")\n        )\n\n\n\n\n\n\n\n\n\n\n4) A cleaned-up reference version\nSame data, but now the plot is readable. The layout is simple, the background is neutral, and unnecessary visual elements are removed.\nGoal: Show the transition from visual noise to a reasonable starting point.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = as.factor(year))) +\n        geom_col() +\n        theme_light() +\n        theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\n\n\n5) Highlighting one meaningful value (Tufte-ish)\nHere we finally work with visual hierarchy: one bar (1967) is emphasized while everything else fades into the background. No gridlines, minimal text, and clear focus on the information that matters.\nGoal: Demonstrate that a minimalist plot can be far more informative than a decorative one.\n\ngapminder %&gt;%\n    filter(country == \"Peru\", year &lt; 1980) %&gt;%\n    ggplot(aes(x = year, y = lifeExp, fill = (year == 1967))) +\n        geom_col() +\n        theme_minimal() +\n        theme(\n            axis.text.y = element_blank(),\n            legend.position = \"none\") +\n    scale_fill_manual(values = c(\"gray\", \"red\")) +\n    geom_text(\n    aes(x = year, y = lifeExp, label = round(lifeExp)), nudge_y = 0.25, size = 7, vjust = 2, color = \"black\")"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
+    "href": "ggplot-gallery/plots/tuftes_principles.html#take-home-message",
+    "title": "Tufte’s principles (and how to avoid lying with axes)",
+    "section": "Take-home message",
+    "text": "Take-home message\n\nIf your axis does not start at zero, explain why and check that it does not distort the story.\nPrefer clarity over decoration.\nThe “best” theme is the one that makes the data the easiest to read.\nHighlight only what carries meaning. Silence around the important signal helps it stand out."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "",
+    "text": "This page shows how different ggplot2 themes change the same plot. We keep the data and geoms fixed, and only swap the theme.\nUse it as inspiration when polishing your own figures."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#data",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#data",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "Data",
+    "text": "Data\nWe use a custom-prepared subset of personality questionnaire data based on the Big Five Inventory (BFI) included in the psych R package by William Revelle (Northwestern University).\nOriginal data source: Revelle, W. (2024). psych: Procedures for Psychological, Psychometric, and Personality Research. Available from CRAN: https://cran.r-project.org/package=psych\nWhat we use here:\n\nthe original BFI dataset (25 self-report items + demographics),\nscored into five trait scales using psych::scoreItems(),\ncleaned, labeled, and saved as bfi_traits.csv for teaching purposes.\n\nIf you want to reproduce the processed file, see src/data_prep/bfi_traits.R.\n\n Download the dataset (bfi_traits.csv) \n\n\nlibrary(tidyverse)\n\n# Load prepared dataset (created by src/data_prep/bfi_traits.R)\nscores &lt;- read_csv2(\"../assets/data/bfi_traits.csv\")\n\n# Base plot: keep geometry constant, no explicit theme here\nbase_plot &lt;- scores %&gt;%\n  pivot_longer(\n    cols = agree:openness,\n    names_to = \"trait\",\n    values_to = \"score\"\n  ) %&gt;%\n  mutate(\n    gender = factor(gender, labels = c(\"Male\", \"Female\")),\n    trait = factor(\n      trait,\n      levels = c(\"agree\", \"conscientious\", \"extraversion\", \"neuroticism\", \"openness\"),\n      labels = c(\"Agreeable\", \"Conscientious\", \"Extraversion\", \"Neuroticism\", \"Openness\")\n    )\n  ) %&gt;%\n  ggplot(aes(x = trait, y = score, fill = gender)) +\n  geom_boxplot() +\n  labs(\n    x = \"BFI trait\",\n    y = \"Score\",\n    title = \"BFI scores by gender\"\n  ) +\n  scale_fill_manual(\n    name = \"Gender\",\n    values = c(\"#008000\", \"#800080\")\n  ) +\n  facet_grid(rows = vars(gender), labeller = label_value)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#default-look-no-theme-added",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#default-look-no-theme-added",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "Default look (no theme added)",
+    "text": "Default look (no theme added)\nThis is what ggplot uses by default (theme_gray()).\n\nbase_plot"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_gray",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_gray",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_gray()",
+    "text": "theme_gray()\nThe default ggplot theme with a light gray background.\nGood when you want a “standard R look” or to emphasize the data over styling.\n\nbase_plot + theme_gray()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_minimal",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_minimal",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_minimal()",
+    "text": "theme_minimal()\nVery light, low‑ink design.\nNice for slides and papers when you want the plot to feel airy and modern.\n\nbase_plot + theme_minimal()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_classic",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_classic",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_classic()",
+    "text": "theme_classic()\nWhite background, clear axes, no gridlines.\nGreat for simple teaching plots and for publications where grids feel cluttered.\n\nbase_plot + theme_classic()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_bw",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_bw",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_bw()",
+    "text": "theme_bw()\nBlack‑and‑white theme with grids.\nA safe “journal‑style” default, especially for printing.\n\nbase_plot + theme_bw()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_light",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_light",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_light()",
+    "text": "theme_light()\nSimilar to theme_gray() but lighter and cleaner.\nGood when you want grids, but less visual weight.\n\nbase_plot + theme_light()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_linedraw",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_linedraw",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_linedraw()",
+    "text": "theme_linedraw()\nCrisp black lines with minimal distractions.\nUseful for technical figures and when you expect black‑and‑white reproduction.\n\nbase_plot + theme_linedraw()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_dark",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_dark",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_dark()",
+    "text": "theme_dark()\nDark background with light grids.\nCan work on dark slides, or when you want a dramatic contrast.\n\nbase_plot + theme_dark()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_void",
+    "href": "ggplot-gallery/plots/theme_showcase_bfi.html#theme_void",
+    "title": "Theme showcase: one plot, many looks",
+    "section": "theme_void()",
+    "text": "theme_void()\nRemoves everything except the data.\nGood for artistic visuals, insets, or when you add your own annotations later.\n\nbase_plot + theme_void()"
+  },
+  {
+    "objectID": "ggplot-gallery/index_ggplot_gallery.html",
+    "href": "ggplot-gallery/index_ggplot_gallery.html",
+    "title": "ggplot Gallery – graph replication",
+    "section": "",
+    "text": "Choose a graph and try to replicate it as accurately as possible in ggplot. On the task page, you will find the target image, hints, data, and the hidden solution.\n\n\n  \n\nggplot Themes\n\n\nLevel 1 • themes\n\n\nOne plot, many looks — compare how different ggplot themes change the presentation.\n\n\n\n  \n\nTufte’s Principles\n\n\nLevel 1 • clarity & minimalism\n\n\nDemonstration of Tufte’s ideas: avoid deception, remove chartjunk, and let the data speak.\n\n\n\n    \n\nTwo-layer scatterplot\n\n\nLevel 1 • layers + smoothing\n\n\nTwo-layer plot: points + a smooth trend line.\n\n\n\n  \n\nScatter correlation (SAT)\n\n\nLevel 1 • correlation + regression\n\n\nExplore the relationship between SAT Verbal and SAT Quantitative scores."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html",
+    "href": "ggplot-gallery/plots/scatter_smooth.html",
+    "title": "Two-layer scatterplot",
+    "section": "",
+    "text": "This task trains the basic ggplot workflow: mapping aesthetics, adding layers, and reading a smooth trend."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#goal",
+    "title": "Two-layer scatterplot",
+    "section": "Goal",
+    "text": "Goal\nReplicate a scatterplot with a smooth trend line.\nFocus first on structure (layers), then on style."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#load-and-preview-data",
+    "title": "Two-layer scatterplot",
+    "section": "Load and preview data",
+    "text": "Load and preview data\nWe will use the built-in cars dataset (speed vs. stopping distance) from the tidyverse package\n\n\nShow solution\nlibrary(tidyverse)\n\nhead(cars)\n\n\n  speed dist\n1     4    2\n2     4   10\n3     7    4\n4     7   22\n5     8   16\n6     9   10"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Two-layer scatterplot",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\nggplot(cars, aes(x = speed, y = dist)) +\n  geom_point()\n\n\n\n\n\n\n\n\n\nWhat to notice: * ggplot(data, aes(...)) defines what is plotted. * geom_point() draws the points."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-2-improve-readability-of-points",
+    "title": "Two-layer scatterplot",
+    "section": "Step 2: Improve readability of points",
+    "text": "Step 2: Improve readability of points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2)\n\n\n\n\n\n\n\n\n\nHints: * size changes point size. * alpha makes points semi-transparent (helps with overplotting)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-3-add-a-smooth-trend-line",
+    "title": "Two-layer scatterplot",
+    "section": "Step 3: Add a smooth trend line",
+    "text": "Step 3: Add a smooth trend line\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(se = TRUE)\n\n\n\n\n\n\n\n\n\nHints: * geom_smooth() adds a model-based trend. * se = TRUE shows a confidence band (gray ribbon)."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-4-tune-the-smooth-optional-but-closer-to-target",
+    "title": "Two-layer scatterplot",
+    "section": "Step 4: Tune the smooth (optional but closer to target)",
+    "text": "Step 4: Tune the smooth (optional but closer to target)\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2) +\n  geom_smooth(method = \"loess\", se = TRUE)\n\n\n\n\n\n\n\n\n\nNotes: * LOESS gives a flexible curve (good for small datasets). * Line color and thickness are styling details."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#step-5-final-polish-labels-clean-theme",
+    "title": "Two-layer scatterplot",
+    "section": "Step 5: Final polish (labels + clean theme)",
+    "text": "Step 5: Final polish (labels + clean theme)\nHints: * make points a little more transparent (70%) * add labs and title + x-axis label “Speed (mph)” + y-axis label “stopping distance (ft)” + plot title “Cars: speed and stopping distance” * set size of all text in the plot to 14 points\n\n\nShow solution\nggplot(cars, aes(speed, dist)) +\n  geom_point(size = 2, alpha = 0.7) +\n  geom_smooth(method = \"loess\", se = TRUE) +\n  labs(\n    x = \"Speed (mph)\",\n    y = \"Stopping distance (ft)\",\n    title = \"Cars: speed and stopping distance\"\n  ) +\n  theme_minimal(base_size = 14)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "href": "ggplot-gallery/plots/scatter_smooth.html#extra-challenges",
+    "title": "Two-layer scatterplot",
+    "section": "Extra challenges",
+    "text": "Extra challenges\n\nRemove the gray confidence band.\nTry a linear trend instead of LOESS.\nChange the point color and add a matching smooth line."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html",
+    "title": "Scatterplot with correlation",
+    "section": "",
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#goal",
+    "title": "Scatterplot with correlation",
+    "section": "",
+    "text": "In this task, you will recreate a correlation scatterplot using SAT Verbal and SAT Quantitative scores.\nThe aim is to practice:\n\nmapping x and y,\nadding layers (geom_point(), geom_smooth()),\ninterpreting a correlation annotation.\n\nAt the bottom of the page, you will find the hidden full solution."
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#data",
+    "title": "Scatterplot with correlation",
+    "section": "Data",
+    "text": "Data\nWe use the cleaned dataset sat_act.csv prepared earlier in src/data_prep/sat_act.R.\n\n\nShow solution\nlibrary(tidyverse)\nlibrary(ggpubr)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-1-start-with-a-basic-scatterplot",
+    "title": "Scatterplot with correlation",
+    "section": "Step 1: Start with a basic scatterplot",
+    "text": "Step 1: Start with a basic scatterplot\n\n\nShow solution\ndf &lt;- read_csv2(\"../../src/data/sat_act.csv\")\n\nhead(df)\n\n\n# A tibble: 6 × 7\n     id gender education   age   ACT  SATV  SATQ\n  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1     1 female         3    19    24   500   500\n2     2 female         3    23    35   600   500\n3     3 female         3    20    21   480   470\n4     4 male           4    27    26   550   520\n5     5 male           2    33    31   600   550\n6     6 male           5    26    28   640   640\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point()"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-2-add-a-regression-line",
+    "title": "Scatterplot with correlation",
+    "section": "Step 2: Add a regression line",
+    "text": "Step 2: Add a regression line\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE)"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-3-improve-readability",
+    "title": "Scatterplot with correlation",
+    "section": "Step 3: Improve readability",
+    "text": "Step 3: Improve readability\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#step-4-add-the-correlation-annotation-optional",
+    "title": "Scatterplot with correlation",
+    "section": "Step 4: Add the correlation annotation (optional)",
+    "text": "Step 4: Add the correlation annotation (optional)\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  )"
+  },
+  {
+    "objectID": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "href": "ggplot-gallery/plots/scatter_correlation_sat_act.html#optional-style-improvements",
+    "title": "Scatterplot with correlation",
+    "section": "Optional style improvements",
+    "text": "Optional style improvements\n\n\nShow solution\nggplot(df, aes(SATV, SATQ)) +\n  geom_point() +\n  geom_smooth(method = \"lm\", se = TRUE) +\n  stat_cor(method = \"pearson\", label.x = 200, size = 5) +\n  labs(\n    x = \"SAT Verbal\",\n    y = \"SAT Quantitative\",\n    title = \"SAT Verbal vs SAT Quantitative\"\n  ) +\n  theme_minimal(base_size = 14) +\n  theme(\n    plot.title = element_text(face = \"bold\"),\n    panel.grid.minor = element_blank()\n  )"
+  },
+  {
+    "objectID": "stats/index_stats.html",
+    "href": "stats/index_stats.html",
+    "title": "Statistics with R – practical walkthrough",
+    "section": "",
+    "text": "Learn statistics through short, focused tasks in R. Each topic combines explanation, hands-on code, and a foldable solution, so you can check your work step by step.\n\n\n\n  \n\nBasic data exploration\n\n\nLevel 0 • essentials\n\n\nMean, median, SD, missing values, frequency tables, and random simulation basics.\n\n\n\n\n  \n\nCorrelation\n\n\nLevel 1 • relationships between variables\n\n\nCompute Pearson/Spearman correlations, interpret results, and visualize relationships.\n\n\n\n\n  \n\nLinear Regression\n\n\nLevel 1 • prediction & interpretation\n\n\nFit linear models, interpret coefficients, visualize predictions, and check model assumptions.\n\n\n\n\n  \n\nGroup Comparisons\n\n\nLevel 1 • t-tests & ANOVA\n\n\nCompare groups using t-tests and ANOVA, inspect effect sizes, and visualize differences.\n\n\n\n\n  \n\nProbability & Simulation\n\n\nLevel 1 • randomness & intuition\n\n\nRoll virtual dice, simulate events, estimate probabilities, and build intuition through code.\n\n\n\n\n  \n\nPower & Sample Size\n\n\nLevel 1 • planning studies\n\n\nUnderstand statistical power, compute required sample sizes, and explore effect size scenarios."
+  },
+  {
+    "objectID": "stats/topics/basics.html",
+    "href": "stats/topics/basics.html",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "This page covers the most practical basics you need before doing any statistics in R:\n\nloading data\nexploring structure\nhandling missing values\ndescriptive statistics\nbasic tables and proportions\nrandom number generation\nchecking simple distribution shapes\n\nYou can use any dataset, but for this tutorial we work with:\nperfectionism_total_scores.csv Small psychological teaching dataset containing one continuous variable: total maladaptive perfectionism score (FMPS_total). The data were adapted from the de-identified adult sample in Ferrari et al. (2018) and simplified for classroom use. In the original study, maladaptive perfectionism was computed as a combined score of four Frost Multidimensional Perfectionism Scale (FMPS) subscales: Concern over Mistakes, Parental Expectations, Parental Criticism, and Doubts about Actions.\nOriginal study: Ferrari, M., Yap, K., Scott, N., Einstein, D. A., & Ciarrochi, J. (2018). Self-compassion moderates the perfectionism and depression link in both adolescence and adulthood. PLOS ONE, 13(2), e0192022. https://doi.org/10.1371/journal.pone.0192022 ￼\nQuestionnaires used in the original study:\n\nFrost Multidimensional Perfectionism Scale (FMPS) — 35 items. Used to derive maladaptive perfectionism (FMPS_total).\nSelf-Compassion Scale – Short Form (SCS-SF) — 12 items. Total self-compassion score (SELF_C).\nDepression Anxiety Stress Scales – Short Form (DASS-21) — 21 items. Subscales for depression, anxiety, and stress.\n\nVariables in our teaching file:\n\nFMPS_total — total maladaptive perfectionism score (higher = more maladaptive perfectionism).\nDASS_Depress — depression symptoms.\nDASS_Anx — anxiety symptoms.\nDASS_Stress — stress symptoms.\nSELF_C — total self-compassion score.\n\nNote: The teaching dataset keeps only variables needed for introductory analyses and may differ slightly in coding/format from the original supporting files.\n\n Download the dataset (perfectionism_total_scores.csv) \n\n\nlibrary(kableExtra)\nlibrary(tidyverse)\ndf &lt;- read_csv2(\"../assets/data/perfectionism_total_scores.csv\")\n\n\n\nUnderstanding your dataset is the very first step. Look at the variable names and data types. What type is the main score variable?\n\nglimpse(df)\n\nRows: 515\nColumns: 10\n$ PartID      &lt;dbl&gt; 1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 19, 21, 22…\n$ FMPS_total  &lt;dbl&gt; 47, 36, 54, 28, 69, 56, 51, 73, 79, 71, 66, 52, 49, 59, 43…\n$ SELF_C      &lt;dbl&gt; 2.384615, 4.076923, 3.423077, 5.000000, 2.000000, 2.615385…\n$ DASS_Depres &lt;dbl&gt; 12, 9, 10, 11, 22, 14, 9, 7, 12, 8, 24, 11, 11, 20, 8, 8, …\n$ DASS_Anx    &lt;dbl&gt; 16, 8, 8, 8, 11, 12, 8, 8, 14, 14, 22, 9, 9, 14, 8, 7, 7, …\n$ DASS_Stress &lt;dbl&gt; 14, 8, 16, 8, 21, 15, 7, 10, 20, 24, 24, 16, 14, 22, 7, 11…\n$ FMPS_Av     &lt;dbl&gt; -13.532, -24.532, -6.532, -32.532, 8.468, -4.532, -9.532, …\n$ SELF_C_Av   &lt;dbl&gt; -0.42838462, 1.26392308, 0.61007692, 2.18700000, -0.813000…\n$ DASS_D_Av   &lt;dbl&gt; -1.631, -4.631, -3.631, -2.631, 8.369, 0.369, -4.631, -6.6…\n$ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.884484…\n\nsummary(df)\n\n     PartID        FMPS_total         SELF_C       DASS_Depres   \n Min.   :  1.0   Min.   : 24.00   Min.   :1.000   Min.   : 7.00  \n 1st Qu.:156.5   1st Qu.: 47.00   1st Qu.:2.231   1st Qu.: 9.00  \n Median :307.0   Median : 60.00   Median :2.731   Median :12.00  \n Mean   :306.2   Mean   : 60.53   Mean   :2.813   Mean   :13.63  \n 3rd Qu.:452.0   3rd Qu.: 72.00   3rd Qu.:3.365   3rd Qu.:18.00  \n Max.   :615.0   Max.   :110.00   Max.   :5.000   Max.   :28.00  \n    DASS_Anx      DASS_Stress       FMPS_Av             SELF_C_Av         \n Min.   : 7.00   Min.   : 7.00   Min.   :-36.532000   Min.   :-1.8130000  \n 1st Qu.: 8.00   1st Qu.:11.00   1st Qu.:-13.532000   1st Qu.:-0.5822308  \n Median :11.00   Median :15.00   Median : -0.532000   Median :-0.0822308  \n Mean   :12.31   Mean   :15.31   Mean   :  0.000039   Mean   : 0.0004429  \n 3rd Qu.:15.00   3rd Qu.:20.00   3rd Qu.: 11.468000   3rd Qu.: 0.5523846  \n Max.   :28.00   Max.   :28.00   Max.   : 49.468000   Max.   : 2.1870000  \n   DASS_D_Av              Int          \n Min.   :-6.631000   Min.   :-76.9945  \n 1st Qu.:-4.631000   1st Qu.:-13.1433  \n Median :-1.631000   Median : -3.9306  \n Mean   : 0.000068   Mean   : -8.1532  \n 3rd Qu.: 4.369000   3rd Qu.:  0.2279  \n Max.   :14.369000   Max.   : 22.1034  \n\nhead(df)\n\n# A tibble: 6 × 10\n  PartID FMPS_total SELF_C DASS_Depres DASS_Anx DASS_Stress FMPS_Av SELF_C_Av\n   &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n1      1         47   2.38          12       16          14  -13.5     -0.428\n2      2         36   4.08           9        8           8  -24.5      1.26 \n3      3         54   3.42          10        8          16   -6.53     0.610\n4      5         28   5             11        8           8  -32.5      2.19 \n5      6         69   2             22       11          21    8.47    -0.813\n6      7         56   2.62          14       12          15   -4.53    -0.198\n# ℹ 2 more variables: DASS_D_Av &lt;dbl&gt;, Int &lt;dbl&gt;\n\n\n\n\n\nCompute the mean, median, and standard deviation of the score.\n\n# Mean\nmean(df$FMPS_total, na.rm = TRUE)\n\n[1] 60.53204\n\n# Median\nmedian(df$FMPS_total, na.rm = TRUE)\n\n[1] 60\n\n# Standard deviation\nsd(df$FMPS_total, na.rm = TRUE)\n\n[1] 16.82909\n\n# Range\nrange(df$FMPS_total, na.rm = TRUE)\n\n[1]  24 110\n\n# Quantile\nquantile(df$FMPS_total, probs = c(.25, .5, .75), na.rm = TRUE)\n\n25% 50% 75% \n 47  60  72 \n\n# Or all in one table\ndf %&gt;%\n    select(FMPS_total:DASS_D_Av) %&gt;%\n    psych::describe() %&gt;%\n    as.data.frame() %&gt;%\n    kbl(digits = 2) %&gt;%\n    kable_styling(bootstrap_options = c(\"striped\", \"hover\"))\n\n\n\n\n\nvars\nn\nmean\nsd\nmedian\ntrimmed\nmad\nmin\nmax\nrange\nskew\nkurtosis\nse\n\n\n\n\nFMPS_total\n1\n515\n60.53\n16.83\n60.00\n60.11\n17.79\n24.00\n110.00\n86\n0.19\n-0.56\n0.74\n\n\nSELF_C\n2\n515\n2.81\n0.77\n2.73\n2.80\n0.86\n1.00\n5.00\n4\n0.18\n-0.50\n0.03\n\n\nDASS_Depres\n3\n515\n13.63\n6.00\n12.00\n12.95\n5.93\n7.00\n28.00\n21\n0.82\n-0.51\n0.26\n\n\nDASS_Anx\n4\n515\n12.31\n5.20\n11.00\n11.56\n4.45\n7.00\n28.00\n21\n1.06\n0.37\n0.23\n\n\nDASS_Stress\n5\n515\n15.31\n5.67\n15.00\n15.01\n5.93\n7.00\n28.00\n21\n0.39\n-0.87\n0.25\n\n\nFMPS_Av\n6\n515\n0.00\n16.83\n-0.53\n-0.42\n17.79\n-36.53\n49.47\n86\n0.19\n-0.56\n0.74\n\n\nSELF_C_Av\n7\n515\n0.00\n0.77\n-0.08\n-0.01\n0.86\n-1.81\n2.19\n4\n0.18\n-0.50\n0.03\n\n\nDASS_D_Av\n8\n515\n0.00\n6.00\n-1.63\n-0.68\n5.93\n-6.63\n14.37\n21\n0.82\n-0.51\n0.26\n\n\n\n\n\n\n\n\n\n\nRemove NA values from score and compute the mean of the cleaned vector.\n\nsum(is.na(df$FMPS_total))\n\n[1] 0\n\ndf_noNA &lt;- df %&gt;% drop_na(FMPS_total)\nnrow(df) - nrow(df_noNA)\n\n[1] 0\n\n\n\n\n\nFor categorical variables we would use table() and prop.table(). Here we artificially convert scores into categories:\nConvert scores into three groups (your own cut points) and compute their proportions.\n\ndf_cat &lt;- df %&gt;%\n  mutate(level = case_when(\n    FMPS_total &lt; 30 ~ \"Low\",\n    FMPS_total &lt; 60 ~ \"Medium\",\n    TRUE ~ \"High\"\n  ))\n\ntable(df_cat$level)\n\n\n  High    Low Medium \n   264     11    240 \n\nprop.table(table(df_cat$level)) %&gt;% round(3)\n\n\n  High    Low Medium \n 0.513  0.021  0.466 \n\n\n\n\n\nGenerate 20 random values from a normal distribution with mean 70 and sd 15.\n\nset.seed(42)\nx &lt;- rnorm(100, mean = 50, sd = 10)\nhead(x)\n\n[1] 63.70958 44.35302 53.63128 56.32863 54.04268 48.93875\n\n\nWhy set.seed()? It makes randomness reproducible.\n\n\n\nNot a hypothesis test — just a visual check.\nInspect the histogram and Q-Q plot. Does the distribution look roughly normal?\n\ndf %&gt;%\n  ggplot(aes(x = FMPS_total)) +\n  geom_histogram(bins = 20, fill = \"#5c6bc0\") +\n  theme_minimal()\n\n\n\n\n\n\n\ndf %&gt;%\n  ggplot(aes(sample = FMPS_total)) +\n  stat_qq() +\n  stat_qq_line(color = \"red\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\n\nAlways start with glimpse(), summary(), head()\nUse na.rm = TRUE when needed\ntable() + prop.table() are essential for categorical summaries\nset.seed() ensures reproducible randomness\nQuick plots often reveal more than formal tests"
+  },
+  {
+    "objectID": "stats/topics/basics.html#first-look-at-the-data",
+    "href": "stats/topics/basics.html#first-look-at-the-data",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Understanding your dataset is the very first step. Look at the variable names and data types. What type is the main score variable?\n\nglimpse(df)\n\nRows: 515\nColumns: 10\n$ PartID      &lt;dbl&gt; 1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 19, 21, 22…\n$ FMPS_total  &lt;dbl&gt; 47, 36, 54, 28, 69, 56, 51, 73, 79, 71, 66, 52, 49, 59, 43…\n$ SELF_C      &lt;dbl&gt; 2.384615, 4.076923, 3.423077, 5.000000, 2.000000, 2.615385…\n$ DASS_Depres &lt;dbl&gt; 12, 9, 10, 11, 22, 14, 9, 7, 12, 8, 24, 11, 11, 20, 8, 8, …\n$ DASS_Anx    &lt;dbl&gt; 16, 8, 8, 8, 11, 12, 8, 8, 14, 14, 22, 9, 9, 14, 8, 7, 7, …\n$ DASS_Stress &lt;dbl&gt; 14, 8, 16, 8, 21, 15, 7, 10, 20, 24, 24, 16, 14, 22, 7, 11…\n$ FMPS_Av     &lt;dbl&gt; -13.532, -24.532, -6.532, -32.532, 8.468, -4.532, -9.532, …\n$ SELF_C_Av   &lt;dbl&gt; -0.42838462, 1.26392308, 0.61007692, 2.18700000, -0.813000…\n$ DASS_D_Av   &lt;dbl&gt; -1.631, -4.631, -3.631, -2.631, 8.369, 0.369, -4.631, -6.6…\n$ Int         &lt;dbl&gt; 5.7969006, -31.0065609, -3.9850225, -71.1474840, -6.884484…\n\nsummary(df)\n\n     PartID        FMPS_total         SELF_C       DASS_Depres   \n Min.   :  1.0   Min.   : 24.00   Min.   :1.000   Min.   : 7.00  \n 1st Qu.:156.5   1st Qu.: 47.00   1st Qu.:2.231   1st Qu.: 9.00  \n Median :307.0   Median : 60.00   Median :2.731   Median :12.00  \n Mean   :306.2   Mean   : 60.53   Mean   :2.813   Mean   :13.63  \n 3rd Qu.:452.0   3rd Qu.: 72.00   3rd Qu.:3.365   3rd Qu.:18.00  \n Max.   :615.0   Max.   :110.00   Max.   :5.000   Max.   :28.00  \n    DASS_Anx      DASS_Stress       FMPS_Av             SELF_C_Av         \n Min.   : 7.00   Min.   : 7.00   Min.   :-36.532000   Min.   :-1.8130000  \n 1st Qu.: 8.00   1st Qu.:11.00   1st Qu.:-13.532000   1st Qu.:-0.5822308  \n Median :11.00   Median :15.00   Median : -0.532000   Median :-0.0822308  \n Mean   :12.31   Mean   :15.31   Mean   :  0.000039   Mean   : 0.0004429  \n 3rd Qu.:15.00   3rd Qu.:20.00   3rd Qu.: 11.468000   3rd Qu.: 0.5523846  \n Max.   :28.00   Max.   :28.00   Max.   : 49.468000   Max.   : 2.1870000  \n   DASS_D_Av              Int          \n Min.   :-6.631000   Min.   :-76.9945  \n 1st Qu.:-4.631000   1st Qu.:-13.1433  \n Median :-1.631000   Median : -3.9306  \n Mean   : 0.000068   Mean   : -8.1532  \n 3rd Qu.: 4.369000   3rd Qu.:  0.2279  \n Max.   :14.369000   Max.   : 22.1034  \n\nhead(df)\n\n# A tibble: 6 × 10\n  PartID FMPS_total SELF_C DASS_Depres DASS_Anx DASS_Stress FMPS_Av SELF_C_Av\n   &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;\n1      1         47   2.38          12       16          14  -13.5     -0.428\n2      2         36   4.08           9        8           8  -24.5      1.26 \n3      3         54   3.42          10        8          16   -6.53     0.610\n4      5         28   5             11        8           8  -32.5      2.19 \n5      6         69   2             22       11          21    8.47    -0.813\n6      7         56   2.62          14       12          15   -4.53    -0.198\n# ℹ 2 more variables: DASS_D_Av &lt;dbl&gt;, Int &lt;dbl&gt;"
+  },
+  {
+    "objectID": "stats/topics/basics.html#descriptive-statistics",
+    "href": "stats/topics/basics.html#descriptive-statistics",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Compute the mean, median, and standard deviation of the score.\n\n# Mean\nmean(df$FMPS_total, na.rm = TRUE)\n\n[1] 60.53204\n\n# Median\nmedian(df$FMPS_total, na.rm = TRUE)\n\n[1] 60\n\n# Standard deviation\nsd(df$FMPS_total, na.rm = TRUE)\n\n[1] 16.82909\n\n# Range\nrange(df$FMPS_total, na.rm = TRUE)\n\n[1]  24 110\n\n# Quantile\nquantile(df$FMPS_total, probs = c(.25, .5, .75), na.rm = TRUE)\n\n25% 50% 75% \n 47  60  72 \n\n# Or all in one table\ndf %&gt;%\n    select(FMPS_total:DASS_D_Av) %&gt;%\n    psych::describe() %&gt;%\n    as.data.frame() %&gt;%\n    kbl(digits = 2) %&gt;%\n    kable_styling(bootstrap_options = c(\"striped\", \"hover\"))\n\n\n\n\n\nvars\nn\nmean\nsd\nmedian\ntrimmed\nmad\nmin\nmax\nrange\nskew\nkurtosis\nse\n\n\n\n\nFMPS_total\n1\n515\n60.53\n16.83\n60.00\n60.11\n17.79\n24.00\n110.00\n86\n0.19\n-0.56\n0.74\n\n\nSELF_C\n2\n515\n2.81\n0.77\n2.73\n2.80\n0.86\n1.00\n5.00\n4\n0.18\n-0.50\n0.03\n\n\nDASS_Depres\n3\n515\n13.63\n6.00\n12.00\n12.95\n5.93\n7.00\n28.00\n21\n0.82\n-0.51\n0.26\n\n\nDASS_Anx\n4\n515\n12.31\n5.20\n11.00\n11.56\n4.45\n7.00\n28.00\n21\n1.06\n0.37\n0.23\n\n\nDASS_Stress\n5\n515\n15.31\n5.67\n15.00\n15.01\n5.93\n7.00\n28.00\n21\n0.39\n-0.87\n0.25\n\n\nFMPS_Av\n6\n515\n0.00\n16.83\n-0.53\n-0.42\n17.79\n-36.53\n49.47\n86\n0.19\n-0.56\n0.74\n\n\nSELF_C_Av\n7\n515\n0.00\n0.77\n-0.08\n-0.01\n0.86\n-1.81\n2.19\n4\n0.18\n-0.50\n0.03\n\n\nDASS_D_Av\n8\n515\n0.00\n6.00\n-1.63\n-0.68\n5.93\n-6.63\n14.37\n21\n0.82\n-0.51\n0.26"
+  },
+  {
+    "objectID": "stats/topics/basics.html#missing-values-na",
+    "href": "stats/topics/basics.html#missing-values-na",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Remove NA values from score and compute the mean of the cleaned vector.\n\nsum(is.na(df$FMPS_total))\n\n[1] 0\n\ndf_noNA &lt;- df %&gt;% drop_na(FMPS_total)\nnrow(df) - nrow(df_noNA)\n\n[1] 0"
+  },
+  {
+    "objectID": "stats/topics/basics.html#frequency-tables-proportions",
+    "href": "stats/topics/basics.html#frequency-tables-proportions",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "For categorical variables we would use table() and prop.table(). Here we artificially convert scores into categories:\nConvert scores into three groups (your own cut points) and compute their proportions.\n\ndf_cat &lt;- df %&gt;%\n  mutate(level = case_when(\n    FMPS_total &lt; 30 ~ \"Low\",\n    FMPS_total &lt; 60 ~ \"Medium\",\n    TRUE ~ \"High\"\n  ))\n\ntable(df_cat$level)\n\n\n  High    Low Medium \n   264     11    240 \n\nprop.table(table(df_cat$level)) %&gt;% round(3)\n\n\n  High    Low Medium \n 0.513  0.021  0.466"
+  },
+  {
+    "objectID": "stats/topics/basics.html#random-numbers-set.seed",
+    "href": "stats/topics/basics.html#random-numbers-set.seed",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Generate 20 random values from a normal distribution with mean 70 and sd 15.\n\nset.seed(42)\nx &lt;- rnorm(100, mean = 50, sd = 10)\nhead(x)\n\n[1] 63.70958 44.35302 53.63128 56.32863 54.04268 48.93875\n\n\nWhy set.seed()? It makes randomness reproducible."
+  },
+  {
+    "objectID": "stats/topics/basics.html#quick-normality-check",
+    "href": "stats/topics/basics.html#quick-normality-check",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Not a hypothesis test — just a visual check.\nInspect the histogram and Q-Q plot. Does the distribution look roughly normal?\n\ndf %&gt;%\n  ggplot(aes(x = FMPS_total)) +\n  geom_histogram(bins = 20, fill = \"#5c6bc0\") +\n  theme_minimal()\n\n\n\n\n\n\n\ndf %&gt;%\n  ggplot(aes(sample = FMPS_total)) +\n  stat_qq() +\n  stat_qq_line(color = \"red\") +\n  theme_minimal()"
+  },
+  {
+    "objectID": "stats/topics/basics.html#take-home-message",
+    "href": "stats/topics/basics.html#take-home-message",
+    "title": "Basics: Working With Data in R",
+    "section": "",
+    "text": "Always start with glimpse(), summary(), head()\nUse na.rm = TRUE when needed\ntable() + prop.table() are essential for categorical summaries\nset.seed() ensures reproducible randomness\nQuick plots often reveal more than formal tests"
+  }
+]
