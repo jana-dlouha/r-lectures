@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>correlation – R Lectures</title>
+<title>Correlation in R – R Lectures</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -111,17 +145,432 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#ice-cream-experiment-basic-correlations" id="toc-ice-cream-experiment-basic-correlations" class="nav-link" data-scroll-target="#ice-cream-experiment-basic-correlations">1. Ice-cream experiment: basic correlations</a>
+  <ul class="collapse">
+  <li><a href="#pearson-correlation" id="toc-pearson-correlation" class="nav-link" data-scroll-target="#pearson-correlation">1.1 Pearson correlation</a></li>
+  <li><a href="#visualising-the-relationship" id="toc-visualising-the-relationship" class="nav-link" data-scroll-target="#visualising-the-relationship">1.2 Visualising the relationship</a></li>
+  <li><a href="#non-parametric-correlations" id="toc-non-parametric-correlations" class="nav-link" data-scroll-target="#non-parametric-correlations">1.3 Non-parametric correlations</a></li>
+  </ul></li>
+  <li><a href="#crime-data-correlation-matrices-and-tests" id="toc-crime-data-correlation-matrices-and-tests" class="nav-link" data-scroll-target="#crime-data-correlation-matrices-and-tests">2. Crime data: correlation matrices and tests</a>
+  <ul class="collapse">
+  <li><a href="#simple-correlation-matrix" id="toc-simple-correlation-matrix" class="nav-link" data-scroll-target="#simple-correlation-matrix">2.1 Simple correlation matrix</a></li>
+  <li><a href="#pairwise-scatterplots" id="toc-pairwise-scatterplots" class="nav-link" data-scroll-target="#pairwise-scatterplots">2.2 Pairwise scatterplots</a></li>
+  <li><a href="#testing-correlations-cor.test" id="toc-testing-correlations-cor.test" class="nav-link" data-scroll-target="#testing-correlations-cor.test">2.3 Testing correlations: <code>cor.test()</code></a></li>
+  </ul></li>
+  <li><a href="#correlations-by-group" id="toc-correlations-by-group" class="nav-link" data-scroll-target="#correlations-by-group">3. Correlations by group</a>
+  <ul class="collapse">
+  <li><a href="#grouped-correlation-summarise-version" id="toc-grouped-correlation-summarise-version" class="nav-link" data-scroll-target="#grouped-correlation-summarise-version">3.1 Grouped correlation (summarise version)</a></li>
+  <li><a href="#grouped-correlation-nested-purrr-version" id="toc-grouped-correlation-nested-purrr-version" class="nav-link" data-scroll-target="#grouped-correlation-nested-purrr-version">3.2 Grouped correlation (nested + purrr version)</a></li>
+  </ul></li>
+  <li><a href="#visualising-correlations-in-larger-sets-of-variables" id="toc-visualising-correlations-in-larger-sets-of-variables" class="nav-link" data-scroll-target="#visualising-correlations-in-larger-sets-of-variables">4. Visualising correlations in larger sets of variables</a>
+  <ul class="collapse">
+  <li><a href="#correlation-heatmap-with-corrplot" id="toc-correlation-heatmap-with-corrplot" class="nav-link" data-scroll-target="#correlation-heatmap-with-corrplot">4.1 Correlation heatmap with <code>corrplot</code></a></li>
+  <li><a href="#smart-correlation-helpers-from-lares" id="toc-smart-correlation-helpers-from-lares" class="nav-link" data-scroll-target="#smart-correlation-helpers-from-lares">4.2 “Smart” correlation helpers from <code>lares</code></a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Correlation in R</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
+</header>
+
+
+<p>This page walks through several ways of working with correlations in R, using two small teaching datasets:</p>
+<ul>
+<li>an <strong>ice-cream experiment</strong> (puzzle vs.&nbsp;video game scores)</li>
+<li>a <strong>US crime dataset</strong> (crime rate, demographics, wages, etc.)</li>
+</ul>
+<p>The goal is not only to compute a single <code>cor()</code> value, but to learn how to:</p>
+<ul>
+<li>compute Pearson, Spearman, and Kendall correlations,</li>
+<li>test correlations with <code>cor.test()</code>,</li>
+<li>compute correlations <strong>separately by groups</strong>,</li>
+<li>explore larger sets of variables with <strong>correlation matrices</strong> and helper functions.</li>
+</ul>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("corrplot")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("lares")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lares)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load datasets</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust paths to match your project structure</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>icecream <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../assets/data/ice_cream.csv"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>crime    <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../assets/data/crime.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+<section id="ice-cream-experiment-basic-correlations" class="level2">
+<h2 class="anchored" data-anchor-id="ice-cream-experiment-basic-correlations">1. Ice-cream experiment: basic correlations</h2>
+<p>In this dataset, participants completed:</p>
+<ul>
+<li>a <strong>puzzle task</strong> (<code>puzzle</code>), and<br>
+</li>
+<li>a <strong>video game task</strong> (<code>video</code>).</li>
+</ul>
+<p>We start with the simplest question:</p>
+<blockquote class="blockquote">
+<p>How strongly are puzzle scores and video game scores related?</p>
+</blockquote>
+<section id="pearson-correlation" class="level3">
+<h3 class="anchored" data-anchor-id="pearson-correlation">1.1 Pearson correlation</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(icecream<span class="sc">$</span>puzzle, icecream<span class="sc">$</span>video)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.465106</code></pre>
+</div>
+</div>
+<p>You can also use the formula interface with <code>with()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(icecream, <span class="fu">cor</span>(puzzle, video))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.465106</code></pre>
+</div>
+</div>
+</section>
+<section id="visualising-the-relationship" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-the-relationship">1.2 Visualising the relationship</h3>
+<p>Base R plot version (quick and simple):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  icecream<span class="sc">$</span>puzzle, icecream<span class="sc">$</span>video,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Correlation between puzzle score</span><span class="sc">\n</span><span class="st">and video game score"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">"Puzzle score"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">"Video game score"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sub  =</span> <span class="fu">paste0</span>(<span class="st">"r = "</span>, <span class="fu">round</span>(<span class="fu">cor</span>(icecream<span class="sc">$</span>puzzle, icecream<span class="sc">$</span>video), <span class="dv">2</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlation_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Bonus task:</strong> Recreate this plot using <strong>ggplot2</strong> instead of base R.</p>
+</blockquote>
+</section>
+<section id="non-parametric-correlations" class="level3">
+<h3 class="anchored" data-anchor-id="non-parametric-correlations">1.3 Non-parametric correlations</h3>
+<p>Sometimes variables are not normally distributed or contain outliers. Two common <strong>rank-based</strong> alternatives are:</p>
+<ul>
+<li><strong>Spearman’s rho</strong></li>
+<li><strong>Kendall’s tau</strong></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spearman's rank correlation</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(icecream<span class="sc">$</span>puzzle, icecream<span class="sc">$</span>video, <span class="at">method =</span> <span class="st">"spearman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4807849</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Kendall's tau</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(icecream<span class="sc">$</span>puzzle, icecream<span class="sc">$</span>video, <span class="at">method =</span> <span class="st">"kendall"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.3657759</code></pre>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Reflection prompt:</strong><br>
+Compare the Pearson, Spearman, and Kendall coefficients.<br>
+Are they similar, or do ranks tell a different story?</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="crime-data-correlation-matrices-and-tests" class="level2">
+<h2 class="anchored" data-anchor-id="crime-data-correlation-matrices-and-tests">2. Crime data: correlation matrices and tests</h2>
+<p>The <code>crime</code> dataset contains several numeric variables such as:</p>
+<ul>
+<li><code>CrimeRate</code> – crime per population<br>
+</li>
+<li><code>Males</code> – number of males in the labour force<br>
+</li>
+<li><code>Wage</code> – average wage<br>
+</li>
+<li><code>StateSize</code> – size of the state, and many others.</li>
+</ul>
+<section id="simple-correlation-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="simple-correlation-matrix">2.1 Simple correlation matrix</h3>
+<p>We can compute a correlation matrix for a small subset of variables:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Males, Wage) <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          CrimeRate     Males      Wage
+CrimeRate 1.0000000 0.1571129 0.4248530
+Males     0.1571129 1.0000000 0.1796086
+Wage      0.4248530 0.1796086 1.0000000</code></pre>
+</div>
+</div>
+<p>Rounded for nicer printing:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Males, Wage) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          CrimeRate Males Wage
+CrimeRate      1.00  0.16 0.42
+Males          0.16  1.00 0.18
+Wage           0.42  0.18 1.00</code></pre>
+</div>
+</div>
+</section>
+<section id="pairwise-scatterplots" class="level3">
+<h3 class="anchored" data-anchor-id="pairwise-scatterplots">2.2 Pairwise scatterplots</h3>
+<p>A quick way to <strong>visualise all pairwise relationships</strong> is <code>pairs()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Males, Wage) <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlation_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Bonus task:</strong> Which pairs look most linear and which look weak or non-linear?</p>
+</blockquote>
+</section>
+<section id="testing-correlations-cor.test" class="level3">
+<h3 class="anchored" data-anchor-id="testing-correlations-cor.test">2.3 Testing correlations: <code>cor.test()</code></h3>
+<p><code>cor()</code> only gives you the coefficient.<br>
+Use <code>cor.test()</code> when you want a <strong>hypothesis test</strong> and a <strong>confidence interval</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test correlation between Males and Wage</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(crime<span class="sc">$</span>Males, crime<span class="sc">$</span>Wage)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  crime$Males and crime$Wage
+t = 1.2248, df = 45, p-value = 0.227
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.1134075  0.4438811
+sample estimates:
+      cor 
+0.1796086 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test correlation between Males and CrimeRate</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(crime<span class="sc">$</span>Males, crime<span class="sc">$</span>CrimeRate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  crime$Males and crime$CrimeRate
+t = 1.0672, df = 45, p-value = 0.2916
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.1361989  0.4251002
+sample estimates:
+      cor 
+0.1571129 </code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="correlations-by-group" class="level2">
+<h2 class="anchored" data-anchor-id="correlations-by-group">3. Correlations by group</h2>
+<p>Sometimes you do not just want “one correlation for everybody”, but separate correlations <strong>within subgroups</strong>.</p>
+<p>In the <code>crime</code> data, variable <code>MoreMales</code> indicates whether the state has a particularly high number of males.</p>
+<section id="grouped-correlation-summarise-version" class="level3">
+<h3 class="anchored" data-anchor-id="grouped-correlation-summarise-version">3.1 Grouped correlation (summarise version)</h3>
+<p>Here we compute the correlation between <code>StateSize</code> and <code>Education</code> <strong>separately</strong> for each value of <code>MoreMales</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, StateSize, Education, Wage, MoreMales) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MoreMales) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">cor_StateSize_Education =</span> <span class="fu">cor</span>(StateSize, Education, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  MoreMales cor_StateSize_Education
+      &lt;dbl&gt;                   &lt;dbl&gt;
+1         0                  0.0210
+2         1                  0.0135</code></pre>
+</div>
+</div>
+<p>This approach is:</p>
+<ul>
+<li>readable,<br>
+</li>
+<li>uses only <code>dplyr</code>,<br>
+</li>
+<li>easy to adapt to other variable pairs.</li>
+</ul>
+</section>
+<section id="grouped-correlation-nested-purrr-version" class="level3">
+<h3 class="anchored" data-anchor-id="grouped-correlation-nested-purrr-version">3.2 Grouped correlation (nested + purrr version)</h3>
+<p>The same idea, but written in a more functional style:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, StateSize, Education, Wage, MoreMales) <span class="sc">%&gt;%</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(MoreMales) <span class="sc">%&gt;%</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cor_test =</span> <span class="fu">map</span>(</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>      data,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">cor.test</span>(.x<span class="sc">$</span>StateSize, .x<span class="sc">$</span>Education, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">tidy_result =</span> <span class="fu">map</span>(cor_test, broom<span class="sc">::</span>tidy)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(MoreMales, tidy_result) <span class="sc">%&gt;%</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(tidy_result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 9
+# Groups:   MoreMales [2]
+  MoreMales estimate statistic p.value parameter conf.low conf.high method      
+      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       
+1         0   0.0210    0.126    0.900        36   -0.301     0.338 Pearson's p…
+2         1   0.0135    0.0357   0.973         7   -0.657     0.672 Pearson's p…
+# ℹ 1 more variable: alternative &lt;chr&gt;</code></pre>
+</div>
+</div>
+<ul>
+<li><code>nest()</code> creates a small tibble for each group in column <code>data</code>.<br>
+</li>
+<li><code>map_dbl()</code> applies <code>cor()</code> inside each small dataset.</li>
+</ul>
+<blockquote class="blockquote">
+<p>This pattern is a gentle introduction to the “split–apply–combine” idea using <strong>nested data frames</strong>.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="visualising-correlations-in-larger-sets-of-variables" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-correlations-in-larger-sets-of-variables">4. Visualising correlations in larger sets of variables</h2>
+<section id="correlation-heatmap-with-corrplot" class="level3">
+<h3 class="anchored" data-anchor-id="correlation-heatmap-with-corrplot">4.1 Correlation heatmap with <code>corrplot</code></h3>
+<p>For many variables, a correlation matrix is easier to read as a <strong>heatmap</strong>.</p>
+<p>The next block:</p>
+<ol type="1">
+<li>Keeps only numeric variables.</li>
+<li>Drops variables with missing values or zero variance.</li>
+<li>Randomly picks 10 numeric variables (just for demo).</li>
+<li>Computes a correlation matrix.</li>
+<li>Plots it with <code>corrplot()</code> and hierarchical clustering.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)  <span class="co"># for reproducible sampling of columns</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(is.numeric) <span class="sc">%&gt;%</span>               <span class="co"># keep only numeric variables</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(<span class="sc">~</span> <span class="sc">!</span><span class="fu">any</span>(<span class="fu">is.na</span>(.))) <span class="sc">%&gt;%</span>        <span class="co"># drop variables with any missing values</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(<span class="sc">~</span> <span class="fu">sd</span>(.) <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span>            <span class="co"># drop variables with zero variance</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">sample</span>(<span class="fu">names</span>(.), <span class="at">size =</span> <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">"complete.obs"</span>) <span class="sc">%&gt;%</span>          <span class="co"># row-wise removal of missing values</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  corrplot<span class="sc">::</span><span class="fu">corrplot</span>(<span class="at">order =</span> <span class="st">"hclust"</span>)   <span class="co"># cluster similar variables</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlation_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<blockquote class="blockquote">
+<p><strong>Bonus task:</strong> Choose your own subset of variables and interpret at least three interesting pairs.</p>
+</blockquote>
+</section>
+<section id="smart-correlation-helpers-from-lares" class="level3">
+<h3 class="anchored" data-anchor-id="smart-correlation-helpers-from-lares">4.2 “Smart” correlation helpers from <code>lares</code></h3>
+<p>The <code>lares</code> package provides convenience functions for quickly exploring correlations in a dataset.</p>
+<section id="top-correlated-pairs" class="level4">
+<h4 class="anchored" data-anchor-id="top-correlated-pairs">4.2.1 Top correlated pairs</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  lares<span class="sc">::</span><span class="fu">corr_cross</span>(<span class="at">pvalue =</span> <span class="fl">0.01</span>, <span class="at">top =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlation_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Same function, but <strong>without plotting</strong>, returning only a table:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  lares<span class="sc">::</span><span class="fu">corr_cross</span>(<span class="at">pvalue =</span> <span class="fl">0.01</span>, <span class="at">top =</span> <span class="dv">10</span>, <span class="at">plot =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+# Rowwise: 
+   key       mix         corr      pvalue group1    cat1      group2    cat2    
+   &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;   
+ 1 Youth     Wage      -0.670 0.000000259 Youth     Youth     Wage      Wage    
+ 2 Youth     BelowWage  0.639 0.00000133  Youth     Youth     Wage      BelowWa…
+ 3 Education BelowWage -0.588 0.0000137   Education Education Wage      BelowWa…
+ 4 Education Wage       0.519 0.000185    Education Education Wage      Wage    
+ 5 CrimeRate Wage       0.425 0.00291     CrimeRate CrimeRate Wage      Wage    
+ 6 Males     StateSize -0.411 0.00414     Males     Males     StateSize StateSi…
+ 7 Youth     Education -0.404 0.00480     Youth     Youth     Education Educati…
+ 8 StateSize Wage       0.308 0.0350      StateSize StateSize Wage      Wage    
+ 9 CrimeRate StateSize  0.308 0.0352      CrimeRate CrimeRate StateSize StateSi…
+10 Youth     StateSize -0.281 0.0560      Youth     Youth     StateSize StateSi…</code></pre>
+</div>
+</div>
+</section>
+<section id="correlations-with-a-selected-variable" class="level4">
+<h4 class="anchored" data-anchor-id="correlations-with-a-selected-variable">4.2.2 Correlations with a selected variable</h4>
+<p>You can also focus on correlations with one target variable, for example <code>CrimeRate</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>crime <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  lares<span class="sc">::</span><span class="fu">corr_var</span>(<span class="at">var =</span> CrimeRate, <span class="at">top =</span> <span class="dv">15</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="correlation_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
