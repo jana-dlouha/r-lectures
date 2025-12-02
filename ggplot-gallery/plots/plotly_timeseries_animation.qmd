@@ -1,0 +1,166 @@
+---
+title: "Gapminder Bubble Animation with Plotly"
+code-fold: false
+---
+
+## Step 1 — Load packages and data
+
+```{r}
+library(gapminder)
+library(plotly)
+library(dplyr)
+
+?gapminder
+
+head(gapminder)
+```
+
+## Step 2 — Build animated bubble chart
+
+```{r}
+
+plot_ly(
+  gapminder,
+  x = ~gdpPercap,
+  y = ~lifeExp,
+  size = ~pop,
+  color = ~continent,
+  frame = ~year,
+  text = ~paste(
+    "Country:", country,
+    "<br>Life expectancy:", lifeExp,
+    "<br>GDP per capita:", round(gdpPercap),
+    "<br>Population:", format(pop, scientific = FALSE)
+  ),
+  hoverinfo = "text",
+  sizes = c(5, 80),
+  type = "scatter",
+  mode = "markers",
+  colors = c("#EE4244FF", "#F8D961FF", "#B6D944FF", "#638E6EFF", "#3C5541FF", "#132157FF"),
+  marker = list(opacity = 0.7, sizemode = "diameter")
+) %>%
+  layout(
+    title = "Global Development Over Time",
+    xaxis = list(title = "GDP per capita", type = "log"),
+    yaxis = list(title = "Life expectancy"),
+    legend = list(title = list(text = "<b>Continent</b>"))
+  )
+```
+
+## Step 3 — Notes
+
+* Each frame corresponds to one year in the dataset.
+* Bubble size encodes population.
+* Bubble color shows continent.
+* The x-axis is on a log scale because GDP per capita varies widely.
+* You can explore how health and wealth evolved globally from 1952–2007.
+
+
+::: callout-question
+## Did you notice anything interesting in 1992?
+
+Have a look at the animation — does anything look unusual?
+
+::: callout-body
+::: {.callout-tip collapse="true"}
+## Explanation
+
+The dramatic collapse around **1992–1994** in Rwanda, Africa is real data — not an artefact.
+
+It reflects the **Rwandan genocide (1994)** and the preceding civil war.
+In the span of a few months, roughly **800,000 people** were killed, the health system collapsed, and mortality skyrocketed.
+
+Gapminder uses 5-year intervals (1987 → 1992 → 1997), so the destruction of 1994 appears as a sharp fall in the **1992** data point.
+
+This is one of the clearest examples where historical events leave a visible fingerprint in demographic data.
+
+You can also tell that **Rwanda is not the only country with a story** hidden in the dots:
+
+- Several **southern African countries** (e.g., Botswana, Zimbabwe, South Africa) show a fall in life expectancy in the 1990s associated with the **HIV/AIDS epidemic**.
+- Some **post-Soviet countries** show stagnation or even decreases in life expectancy and income after the **collapse of the USSR**.
+- Other countries (for example in East Asia) show long, smooth climbs in income and life expectancy that correspond to periods of **rapid economic development**.
+
+:::
+:::
+:::
+
+::: callout-question
+## Are GDP per capita and life expectancy related?
+
+
+::: callout-body
+::: {.callout-tip collapse="true"}
+## Explanation
+
+The overall Pearson correlation in the full Gapminder dataset is
+**r ≈ 0.58 (p < .001)**, with a confidence interval roughly **0.55–0.61**.
+
+```{r}
+cor.test(gapminder$lifeExp, gapminder$gdpPercap)
+
+ggplot(gapminder, aes(x = lifeExp, y = gdpPercap)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    facet_wrap(~continent) +
+    theme_light()
+```
+
+This means:
+
+- Countries with **higher income per person** tend to have **longer life expectancy**.
+- The relationship is strong, but not perfect – several regions rise faster or slower depending on history, politics, healthcare, or conflict.
+- In the animation, this appears as a **general upward-right trend**: bubbles move toward higher GDP and higher life expectancy over time.
+
+Interpreting this correlation requires some care:
+
+- GDP per capita does *not* biologically “cause” longer life.
+- Instead, it serves as a **proxy** for infrastructure, stability, healthcare availability, sanitation, education, and reduced child mortality, all of which increase average lifespan.
+- Large deviations (e.g., sudden drops in Rwanda or HIV-related declines in southern Africa) reveal how **historical shocks** can break this pattern.
+
+So while r ≈ 0.58 might look like a simple number, in context it summarises decades of global public-health, economics, and political history.
+:::
+
+
+::: callout-question
+## Bonus task – per-continent correlation
+
+Can you compute the correlation between GDP per capita and life expectancy **separately for each continent**?
+
+Hint: Instead of writing five separate `cor.test()` calls, try to use a *grouped* workflow and let R repeat the test for you.
+
+::: callout-body
+::: {.callout-tip collapse="true"}
+## Suggested solution
+
+One neat approach is to combine:
+
+- `group_by(continent)` – to split the data into continent-wise groups
+- `nest()` – to store each group’s rows in a list-column `data`
+- `map()` – to run `cor.test()` on each nested dataset
+- `broom::tidy()` – to turn the test output into a clean tibble
+
+```{r}
+library(broom)
+library(tidyverse)
+
+gapminder %>%
+  group_by(continent) %>%
+  nest() %>%
+  mutate(
+    cor_test = map(
+      data,
+      ~ cor.test(.x$lifeExp, .x$gdpPercap, use = "complete.obs")
+    ),
+    tidy_cor = map(cor_test, broom::tidy)
+  ) %>%
+  select(continent, tidy_cor) %>%
+  unnest(tidy_cor)
+```
+This way you get a tidy table with one row per continent, including the
+correlation estimate, confidence interval, and p-value.
+
+
+:::
+:::
+:::
+

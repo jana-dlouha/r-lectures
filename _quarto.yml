@@ -4,6 +4,8 @@ project:
   resources:
     - shared/
 
+freeze: auto
+
 website:
   title: "R Lectures"
   navbar:
@@ -20,7 +22,6 @@ execute:
   message: false
   eval: true
   echo: true
-  freeze: false
 
 format:
   html:

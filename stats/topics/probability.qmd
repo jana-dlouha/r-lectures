@@ -1,0 +1,443 @@
+---
+title: "Binomial distribution: coin flips"
+code-fold: false
+---
+
+This page introduces the binomial distribution using coin flips:
+
+* we start with simple rbinom() simulations
+* then move to histograms and densities
+* and finally compare simulated probabilities to the exact binomial values from
+  dbinom() and pbinom().
+
+The goal is to connect intuition (simulated coin flips) with formal
+probability (binomial formulas).
+
+## 1. Setup
+
+```{r}
+library(tidyverse)
+library(flextable)
+
+theme_colors <- data.frame(
+    light_blue   = "#619CFF",
+    light_orange = "#ffc461"
+)
+
+theme_colors
+
+theme_set(theme_light())
+```
+
+## 2. Flipping a coin with rbinom()
+
+rbinom() generates random outcomes from a binomial distribution:
+• n = number of generated observations
+• size = number of trials (e.g. number of flips)
+• prob = probability of success on each trial
+
+### 2.1 One coin, one flip
+
+```{r}
+
+# One Bernoulli trial: 0 = tails, 1 = heads
+
+rbinom(n = 1, size = 1, prob = 0.5)
+```
+
+### 2.2 One coin, many flips
+
+```{r}
+
+# One coin flipped 10 times
+
+rbinom(n = 1, size = 10, prob = 0.5)
+
+# 10 separate flips of one coin (10 Bernoulli trials)
+
+rbinom(n = 10, size = 1, prob = 0.5)
+```
+
+## 3. Many flips, many coins
+
+Now we simulate a lot of flips to see how the distribution of heads behaves.
+
+### 3.1 One coin flipped 100,000 times
+
+```{r}
+
+data.frame(
+    flips_1 = rbinom(n = 100000, size = 1, prob = 0.5)
+) %>%
+    as_tibble() %>%
+    rowid_to_column("id")
+
+```
+
+### 3.2 10, 100, and 1000 coins (each repeated 100,000×)
+
+Each row below is one experiment (e.g. "flip 10 coins and count heads").
+We repeat such experiments 100,000 times for 10, 100, and 1000 coins.
+
+```{r}
+coin_flips_multiple <- data.frame(
+    flips_10   = rbinom(n = 100000, size = 10,   prob = 0.5),
+    flips_100  = rbinom(n = 100000, size = 100,  prob = 0.5),
+    flips_1000 = rbinom(n = 100000, size = 1000, prob = 0.5)
+) %>%
+    as_tibble() %>%
+    rowid_to_column("id") %>%
+    tidyr::pivot_longer(
+        cols = starts_with("flips_"),
+        names_to = "n",
+        values_to = "heads"
+    )
+
+coin_flips_multiple
+```
+
+### 3.3 Empirical probabilities
+
+```{r}
+coin_flips_multiple_prob <- coin_flips_multiple %>%
+    group_by(n, heads) %>%
+    summarise(freq = n(), .groups = "drop") %>%
+    mutate(prob = freq / 100000)
+
+coin_flips_multiple_prob
+```
+
+## 4. Visualising the distributions
+
+### 4.1 Histograms
+
+```{r}
+ggplot(coin_flips_multiple, aes(x = heads)) +
+    geom_histogram(fill = "steelblue", bins = 30) +
+    facet_wrap(~ n, scales = "free") +
+    labs(
+        x = "Number of heads",
+        y = "Count",
+        title = "Distribution of heads for 10, 100, and 1000 coin flips"
+    )
+```
+
+### 4.2 Smoothed densities
+
+```{r}
+ggplot(coin_flips_multiple, aes(x = heads)) +
+    geom_density(fill = "steelblue", alpha = 0.5, adjust = 10) +
+    facet_wrap(~ n, scales = "free_x") +
+    labs(
+        x = "Number of heads",
+        y = "Density",
+        title = "Approximate density of heads counts"
+    )
+```
+
+## 5. Exact distribution for 10 flips
+
+Focus now on 10-coin experiments and summarise how often we see 0, 1, 2, …, 10
+heads.
+
+```{r}
+coin_flips <- coin_flips_multiple %>%
+    tidyr::pivot_wider(
+        id_cols = id,
+        names_from = n,
+        values_from = heads
+    )
+
+coin_flips_results <- data.frame(
+    table(coin_flips$flips_10),
+    prop.table(table(coin_flips$flips_10)) %>% round(3),
+    cumulative = cumsum(prop.table(table(coin_flips$flips_10))) %>% round(3)
+) %>%
+    select(-Var1.1)
+
+names(coin_flips_results) <- c("result", "n", "prop", "cumulative")
+
+coin_flips_results <- coin_flips_results %>%
+    as.matrix() %>%
+    t() %>%
+    as.data.frame()
+
+coin_flips_results <- rownames_to_column(coin_flips_results, "heads")
+
+flextable::flextable(coin_flips_results[-1, ])
+```
+
+## 6. Mean and SD from simulation
+
+Simulate 10-coin experiments and measure mean and standard deviation of heads.
+
+```{r}
+flips <- rbinom(n = 100000, size = 10, prob = 0.5)
+
+sd(flips)
+mean(flips)
+
+# Sanity check: proportions must sum to 1
+
+mean(flips == 5) + mean(flips < 5) + mean(flips > 5)
+```
+
+## 7. Visualising probabilities for 10 flips
+
+### 7.1 Bar plot of empirical probabilities
+
+```{r}
+flips <- rbinom(n = 100000, size = 10, prob = 0.5)
+
+flips %>%
+    table() %>%
+    as_tibble() %>%
+    ggplot(aes(x = factor(., levels = 0:10), y = n / 100000, fill = .)) +
+        geom_col() +
+        theme(legend.position = "none", text = element_text(size = 20)) +
+        xlab("Number of heads out of 10 coin flips") +
+        ylab("Result probability") +
+        ggtitle("Empirical distribution of heads (10 flips)")
+```
+
+### 7.2 Highlight exactly 5 heads
+
+```{r}
+flips %>%
+    table() %>%
+    as_tibble() %>%
+    ggplot(aes(x = factor(., levels = 0:10), y = n / 100000, fill = !(. == 5))) +
+        geom_col() +
+        theme(legend.position = "none", text = element_text(size = 20)) +
+        xlab("Number of heads out of 10 coin flips") +
+        ylab("Result probability") +
+        ggtitle("Highlighting exactly 5 heads out of 10")
+
+mean(flips == 5)
+```
+
+### 7.3 Highlight "extreme" results (0–2 heads)
+
+```{r}
+flips %>%
+    table() %>%
+    as_tibble() %>%
+    ggplot(aes(x = factor(., levels = 0:10), y = n / 100000, fill = !(factor(., levels = 0:10) %in% 0:2))) +
+        geom_col() +
+        theme(legend.position = "none", text = element_text(size = 20)) +
+        xlab("Number of heads out of 10 coin flips") +
+        ylab("Result probability") +
+        ggtitle("Highlighting 0–2 heads out of 10")
+
+mean(flips < 3)
+sum(flips < 3)
+```
+
+## 8. Exact binomial probabilities
+
+Now we move from simulation to exact formulas.
+
+### 8.1 Point probabilities with dbinom()
+
+```{r}
+dbinom(x = 5,  size = 10, prob = 0.5)  # exactly 5 heads out of 10
+dbinom(x = 6,  size = 10, prob = 0.5)  # exactly 6 heads
+dbinom(x = 10, size = 10, prob = 0.5)  # all 10 heads
+```
+
+### 8.2 Cumulative probabilities with pbinom()
+
+```{r}
+
+# P(X <= 4) for X ~ Binomial(size = 10, prob = 0.5)
+
+pbinom(q = 4, size = 10, prob = 0.5)
+```
+
+Compare with simulation:
+
+```{r}
+flips <- rbinom(n = 100000, size = 10, prob = 0.5)
+mean(flips <= 4)
+
+mean(rbinom(n = 100000, size = 10, prob = 0.5))
+sd(rbinom(n = 100000, size = 10, prob = 0.5))
+```
+
+### 8.3 Theoretical mean and variance
+
+For X \sim \text{Binomial}(n, p):
+
+* \mathbb{E}(X) = np
+* \text{Var}(X) = np(1 - p)
+
+```{r}
+size <- 100  # number of coins
+prob <- 0.5  # probability of heads
+
+data.frame(
+    var  = round(size * prob * (1 - prob), 3),
+    sd   = round(sqrt(size * prob * (1 - prob)), 3),
+    mean = size * prob
+)
+```
+
+## 9. Example: "Extreme" result with 100 coins
+
+### 9.1 Example: How extreme is 56 heads out of 100?
+
+We now switch from intuition (simulation) to exact probability using the binomial distribution
+\(X \sim \mathrm{Binomial}(100, 0.5)\\).
+
+The expected number of heads is:
+
+* mean = 50
+* standard deviation = $\sqrt{100 \cdot 0.5 \cdot 0.5} = 5$
+
+So 56 heads is more than 1 SD above the mean, and values of 44 or fewer are symmetric on the left.
+
+This motivates the idea of a two-tailed test:
+“How surprising is it to be this far from the mean (on either side)?”
+
+```{r}
+
+dbinom(x = 56, size = 100, prob = 0.5)
+
+```
+
+The value `0.03895` means that **if the coin is truly fair**, the probability of getting
+**exactly 56 heads out of 100 flips** is about **3.9%**.
+
+In other words, if you repeated this experiment many times (always 100 flips of a fair coin),
+you would expect an outcome of *exactly* 56 heads in roughly **4 out of 100 experiments**.
+It’s rare, but not impossible — which is exactly the kind of “unusual but still plausible”
+event that hypothesis tests are built around.
+
+### 9.2 Two-tailed probability: 56 or more heads, OR 44 or fewer
+
+We look at:
+
+* right tail: 56, 57, …, 100
+* left tail: 0, 1, …, 44
+(because 50 – (56 – 50) = 44)
+
+We now compute the probability of being at least this extreme in both tails:
+
+```{r}
+n <- 100
+p <- 0.5
+
+# P(X >= 56)
+
+P_ge_56 <- sum(dbinom(x = 56:100, size = n, prob = p))
+
+# P(X <= 44)
+
+P_le_44 <- sum(dbinom(x = 0:44, size = n, prob = p))
+
+# Two-tailed probability
+
+P_ge_56 + P_le_44
+
+```
+
+::: {.callout-tip title="Interpreting the two-tailed probability"}
+
+The value of **0.27** means that about **27 % of all outcomes** (under a perfectly fair coin) are **at least as extreme** as getting 56 heads out of 100 tosses.
+
+### What does “as extreme” mean?
+
+We consider outcomes that are **at least 6 away from the mean (50)**:
+
+- **Right tail:** 56, 57, …, 100
+- **Left tail:** 44, 43, …, 0
+  (because 56 is 6 above the mean → we also check 6 below the mean)
+
+This includes **many** results, not just a single number — which is why the probability is much larger than `P(X = 56)`.
+
+### Why is 27 % not surprising?
+
+Because in a two-tailed test we ask:
+
+> **“How often would we see a result at least this far from the mean if the coin were fair?”**
+
+The answer is:
+👉 **Roughly one out of four experiments** will produce a result this extreme or more.
+
+So **56 heads out of 100 is perfectly compatible with a fair coin**.
+It is *not* evidence of bias.
+
+:::
+
+
+### 9.3 Visualising the extremeness
+
+```{r}
+# Compute the full binomial distribution
+df <- data.frame(
+  heads = 0:100,
+  prob  = dbinom(0:100, size = 100, prob = 0.5)
+)
+
+df <- df %>%
+  mutate(
+    extreme = (heads >= 56) | (heads <= 44)   # highlight tail areas
+  )
+
+ggplot(df, aes(x = heads, y = prob, fill = extreme)) +
+    geom_col() +
+    scale_fill_manual(
+        values = c("FALSE" = "grey80", "TRUE" = "#FC4E07"),
+        labels = c("Typical outcomes", "Extreme outcomes")
+    ) +
+    labs(
+        title = "Two-tailed extremeness for 100 coin flips",
+        subtitle = "Values ≥ 56 or ≤ 44 are symmetric deviations from the mean (50)",
+        x = "Number of heads",
+        y = "Exact probability P(X = x)"
+    ) +
+        theme_minimal(base_size = 16) +
+        theme(
+        legend.title = element_blank(),
+        legend.position = "bottom"
+    )
+```
+
+### 9.4 Interpretation
+
+::: {.callout-tip title="How to read this graph (interpretation)"}
+
+This visualisation shows **exact probabilities** for all possible numbers of heads in 100 coin flips.
+
+### What the shape tells us
+
+- The **center** (around 50) holds most of the probability mass.
+  This is what you expect from a fair coin: outcomes cluster tightly around the mean.
+
+- The orange bars highlight the **extreme regions**:
+  - **56, 57, …, 100** on the right
+  - **44, 43, …, 0** on the left
+  These values are equally “far from the mean” in either direction.
+
+- Each orange bar individually is **rare**, and together they form the total probability of
+  **“being at least this far from 50”**.
+
+### What this means for our example
+
+A result like **56 heads** is surprising — but **not shocking**.
+About **27 %** of all experiments would produce an outcome at least this extreme
+(either ≥ 56 or ≤ 44), *even if the coin is perfectly fair*.
+
+In other words:
+
+> **Unusual outcomes happen quite often.**
+> A single result like 56/100 is not strong evidence that the coin is biased.
+
+### Connection to hypothesis testing
+
+This is exactly the logic behind **two-sided p-values**:
+we evaluate how often we would observe a result **at least this extreme** under the assumption that nothing unusual is happening.
+
+:::
+
+

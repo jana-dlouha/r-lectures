@@ -1,0 +1,109 @@
+---
+title: "3D regression surface: iris SVR example"
+format: html
+---
+
+This page demonstrates how to build a **3D regression surface** using:
+
+- two predictors: `Sepal.Width`, `Sepal.Length`
+- one outcome: `Petal.Width`
+- a flexible **support vector regression (SVR)** model
+- interactive **plotly** surface rendering
+
+The goal is to visualise how a smooth non–linear model passes through the cloud of observed flowers.
+
+## Load data and packages
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(kernlab)
+library(pracma)
+library(plotly)
+
+iris_tbl <- as_tibble(iris)
+glimpse(iris_tbl)
+```
+
+## Step 1 — Select predictors and outcome
+
+```{r}
+X <- iris_tbl %>%
+  select(Sepal.Width, Sepal.Length)
+
+y <- iris_tbl %>%
+  select(Petal.Width)
+```
+
+## Step 2 — Fit SVR model
+
+```{r}
+model <- svm_rbf(cost = 1.0) %>%
+  set_engine("kernlab") %>%
+  set_mode("regression") %>%
+  fit(Petal.Width ~ Sepal.Width + Sepal.Length, data = iris_tbl)
+```
+
+## Step 3 — Create prediction grid
+
+```{r}
+mesh_size <- .02
+margin <- 0
+
+x_min <- min(X$Sepal.Width) - margin
+x_max <- max(X$Sepal.Width) - margin
+y_min <- min(X$Sepal.Length) - margin
+y_max <- max(X$Sepal.Length) - margin
+
+xrange <- seq(x_min, x_max, mesh_size)
+yrange <- seq(y_min, y_max, mesh_size)
+
+xy <- meshgrid(x = xrange, y = yrange)
+xx <- xy$X
+yy <- xy$Y
+```
+
+## Step 4 — Predict values on grid
+
+```{r}
+dim_val <- dim(xx)
+
+xx1 <- matrix(xx, length(xx), 1)
+yy1 <- matrix(yy, length(yy), 1)
+final <- cbind(xx1, yy1)
+
+pred <- model %>%
+  predict(final)
+
+pred <- pred$.pred
+z_pred <- matrix(pred, dim_val[1], dim_val[2])
+```
+
+## Step 5 — Construct interactive 3D plot
+
+```{r}
+fig <- plot_ly(
+  iris_tbl,
+  x = ~Sepal.Width,
+  y = ~Sepal.Length,
+  z = ~Petal.Width
+) %>%
+  add_markers(size = 4, name = "Observed flowers") %>%
+  add_surface(
+    x = xrange,
+    y = yrange,
+    z = z_pred,
+    opacity = 0.7,
+    name = "SVR prediction surface",
+    showscale = TRUE
+  ) %>%
+  layout(
+    scene = list(
+      xaxis = list(title = "Sepal width"),
+      yaxis = list(title = "Sepal length"),
+      zaxis = list(title = "Petal width")
+    )
+  )
+
+fig
+```

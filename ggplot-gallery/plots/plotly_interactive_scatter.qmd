@@ -1,0 +1,365 @@
+---
+title: "3D regression surface with plotly"
+code-fold: false
+---
+
+This page demonstrates how to build a **3D regression surface** using:
+
+- two predictors: `Sepal.Width` and `Sepal.Length`
+- one continuous outcome: `Petal.Width`
+- a non-linear **support vector regression (SVR)** model
+- an interactive **plotly** surface to explore the fitted function
+
+The goal is to show how a smooth non-linear model passes through the observed
+flower measurements in the classic `iris` dataset.
+
+## Packages used in this example
+
+**kernlab**
+Provides kernel-based machine learning methods, including Support Vector
+Machines.
+Used here to fit a radial-basis-function SVR model.
+<https://cran.r-project.org/package=kernlab>
+
+**pracma**
+Numerical tools for working with matrices and grids.
+`meshgrid()` from this package generates the 2D prediction grid.
+<https://cran.r-project.org/package=pracma>
+
+**plotly**
+Renders interactive 3D graphics—rotation, zooming, hover labels, and smooth
+surface interpolation.
+Core engine for the resulting visualisation.
+<https://plotly.com/r/>
+
+**tidymodels**
+Unified modelling interface. Wraps the SVR model and simplifies fitting and
+predicting.
+<https://www.tidymodels.org/>
+
+**tidyverse**
+Provides clean data manipulation and piping. Used to select variables, create
+grids, and process predictions before plotting.
+
+The examples on this page use the classic `iris` dataset from the
+**datasets** package in base R.
+
+Each row describes one iris flower, measured by:
+
+- **Sepal length / width** – size of the outer leaf-like part of the flower
+- **Petal length / width** – size of the inner coloured petals
+- **Species** – Setosa, Versicolor, or Virginica
+
+The schematic below shows where *sepal* and *petal* are on the flower.
+
+## Load data and packages
+
+```{r}
+library(kernlab)
+library(pracma)
+library(plotly)
+library(tidymodels)
+library(tidyverse)
+
+(iris <- as_tibble(iris))
+
+```
+
+## Step 1 — Select predictors and outcome
+
+We begin by choosing which variables define the **horizontal plane** of our 3D model and which variable we want to **predict**.
+
+- `X` are the **predictors**.
+  These two variables define the *input space* — every point in this plane will receive a predicted value.
+
+- `y` is the **outcome**.
+  This is the variable whose values we try to approximate with a smooth model.
+
+Together they specify the regression problem:
+
+> Predict *Petal.Width* from *Sepal.Width* and *Sepal.Length*.
+
+```{r}
+X <- iris %>%
+  select(Sepal.Width, Sepal.Length)
+
+y <- iris %>%
+  select(Petal.Width)
+
+X
+y
+```
+
+```{r}
+X <- iris %>%
+  select(Sepal.Width, Sepal.Length)
+
+X
+
+y <- iris %>%
+  select(Petal.Width)
+
+y
+
+```
+
+## Step 2 — Understanding the SVR model
+
+In this step we train a **Support Vector Regression (SVR)** model to learn the relationship:
+
+$$
+\text{Petal.Width} = f(\text{Sepal.Width},\ \text{Sepal.Length})
+$$
+
+The goal is not classification, but a **smooth, flexible regression surface** that later becomes the 3D plot.
+
+---
+
+### Support Vector Regression (SVR) in simple terms
+
+SVR is designed to capture **non-linear patterns** while keeping the fitted function smooth and controlled.
+It does this by:
+
+- allowing small errors (inside an ε-tube)
+- penalising larger errors
+- using a **kernel function** (here: RBF) to bend the surface in non-linear ways
+
+The result is a balanced, smooth 3D surface that follows the structure of the data without overfitting.
+
+---
+
+### Key parts of the printed model output
+
+#### **SV type: eps-svr (regression)**
+This is a regression-oriented variant of SVM.
+Instead of predicting classes, it predicts a continuous outcome (Petal.Width).
+
+#### **epsilon = 0.1**
+Epsilon defines the width of the “tube” within which errors are ignored.
+
+- larger ε → smoother surface
+- smaller ε → more detailed, potentially wiggly fit
+
+#### **cost C = 1**
+C controls how strongly the model penalizes errors outside the ε-tube.
+
+- high C → the model tries to fit almost everything
+- low C → more regularized, more stable surface
+
+Here, **C = 1** gives a well-balanced, conservative model.
+
+#### **Gaussian RBF kernel**
+The radial-basis kernel allows the model to bend and warp the fitted surface.
+Without it (e.g., using a linear kernel), the result would be almost a flat plane.
+
+RBF produces the smooth hills and valleys you later see in the 3D plot.
+
+#### **sigma**
+Sigma determines how wide the influence of each point is:
+
+- small sigma → very wiggly surface
+- large sigma → very smooth surface
+
+Sigma is estimated automatically from the data.
+
+#### **Number of support vectors**
+Support vectors are the points that lie *outside* the ε-tube.
+These are the data points that actually shape the regression surface.
+
+In this example: **116 support vectors out of 150 flowers**
+→ the data have quite a bit of non-linear structure.
+
+#### **Training error**
+Indicates how closely the model matches the training data.
+A value around 0.12 means the average error is about 0.12 cm of Petal.Width — very reasonable.
+
+---
+
+### Summary
+
+This step fits a **non-linear SVR model** that can describe how Sepal.Width and Sepal.Length jointly predict Petal.Width.
+The RBF kernel gives the model flexibility, while parameters like ε and C keep the surface stable and smooth.
+The trained model is then used in the next steps to generate predictions on a grid and to construct the interactive 3D surface.
+
+```{r}
+model <- svm_rbf(cost = 1.0) %>%
+  set_engine("kernlab") %>%
+  set_mode("regression") %>%
+  fit(Petal.Width ~ Sepal.Width + Sepal.Length, data = iris)
+
+  model
+```
+
+## Step 3 — Creating the prediction grid
+
+To draw a smooth 3D surface, the model needs to be evaluated not only on the observed data points, but on a **dense grid** that covers the entire Sepal.Width × Sepal.Length space.
+
+We therefore:
+
+- compute the minimum and maximum of both predictors
+- generate sequences (`xrange`, `yrange`) with a small step (`mesh_size = 0.02`)
+- combine them into a 2D lattice using `meshgrid()`
+
+This grid contains **thousands of (x, y) points**, evenly spaced across the whole plane.
+These points will later receive predicted Petal.Width values, forming the smooth surface.
+
+The grid itself has no biology in it — it is simply a mathematical canvas on which we paint the regression model.
+
+```{r}
+mesh_size <- .02
+margin <- 0
+
+x_min <- min(X$Sepal.Width) - margin
+x_max <- max(X$Sepal.Width) - margin
+y_min <- min(X$Sepal.Length) - margin
+y_max <- max(X$Sepal.Length) - margin
+
+xrange <- seq(x_min, x_max, mesh_size)
+yrange <- seq(y_min, y_max, mesh_size)
+str(yrange)
+
+xy <- meshgrid(x = xrange, y = yrange)
+xx <- xy$X
+yy <- xy$Y
+```
+
+## Step 4 — Predicting values on the grid
+
+The SVR model was trained on the real iris flowers, but here we need predictions for every point in the artificial grid.
+
+We therefore:
+
+1. reshape the grid matrices (`xx`, `yy`) into long column vectors
+2. combine them into a two-column matrix (`final`)
+3. feed all points into the trained model at once
+4. reshape the predictions back into a matrix with the same dimensions as the grid
+
+This gives us a predicted Petal.Width value for every location in the grid, turning the learned SVR function into a **smooth 3D surface**.
+
+The result (`pred`) is a matrix perfectly aligned with the grid and ready to be plotted using plotly’s `add_surface()`.
+
+```{r}
+dim_val <- dim(xx)
+dim_val
+
+xx1 <- matrix(xx, length(xx), 1)
+yy1 <- matrix(yy, length(yy), 1)
+final <- cbind(xx1, yy1)
+
+pred <- model %>%
+  predict(final)
+
+pred <- pred$.pred
+str(pred)
+
+z_pred <- matrix(pred, dim_val[1], dim_val[2])
+str(z_pred)
+```
+
+## Step 5 — Construct interactive 3D plot
+
+### Step 5a — Construct the basic 3D scatter plot
+
+This first version shows only the **raw data** in three dimensions.
+Before fitting any model, we visualise the actual measurements and the geometric shape of the data cloud.
+
+```{r}
+
+plot_ly(
+  iris,
+  x = ~Sepal.Width,
+  y = ~Sepal.Length,
+  z = ~Petal.Width
+)
+
+
+```
+
+### Step 5b — Add observed points with marker styling
+
+Now we add proper **3D markers**, giving the point cloud more structure.
+This version will serve as the visual base on which the regression surface will be placed.
+
+```{r}
+plot_ly(
+  iris,
+  x = ~Sepal.Width,
+  y = ~Sepal.Length,
+  z = ~Petal.Width
+) %>%
+  add_markers(size = 4, name = "Observed flowers")
+
+```
+
+### Step 5c — Add the SVR regression surface
+
+We now overlay the **predicted 3D surface** produced by the Support Vector Regression model.
+The surface shows how the fitted function behaves across the entire grid of sepal measurements.
+
+```{r}
+plot_ly(
+  iris,
+  x = ~Sepal.Width,
+  y = ~Sepal.Length,
+  z = ~Petal.Width
+) %>%
+  add_markers(size = 4, name = "Observed flowers") %>%
+  add_surface(
+    x = xrange,
+    y = yrange,
+    z = z_pred,
+    opacity = 0.7,
+    name = "SVR prediction surface",
+    showscale = TRUE
+  )
+
+```
+
+### Step 5d — Adjust 3D scene layout
+
+The final version improves readability:
+custom axis titles, balanced camera angle, and a clean 3D scene.
+
+```{r}
+  plot_ly(
+  iris,
+  x = ~Sepal.Width,
+  y = ~Sepal.Length,
+  z = ~Petal.Width
+) %>%
+  add_markers(size = 4, name = "Observed flowers") %>%
+  add_surface(
+    x = xrange,
+    y = yrange,
+    z = z_pred,
+    opacity = 0.7,
+    name = "SVR prediction surface",
+    showscale = TRUE
+  ) %>%
+  layout(
+    scene = list(
+      xaxis = list(title = "Sepal width"),
+      yaxis = list(title = "Sepal length"),
+      zaxis = list(title = "Petal width")
+    )
+  )
+
+
+```
+
+
+
+## Interacting with the 3D plot
+
+The plotly figure is not just a static picture – you can explore the fitted surface interactively:
+
+- **Rotate** – click and drag with the left mouse button to change the viewing angle.
+- **Zoom** – use the mouse wheel or the *Zoom* tool in the toolbar to move closer or farther away.
+- **Pan** – drag with the right mouse button (or with a two-finger drag on a trackpad) to shift the whole scene.
+- **Reset view** – double-click inside the plot or click the *home* icon in the toolbar to go back to the default view.
+- **Hover tooltips** – move the mouse over points to see the exact `Sepal.Width`, `Sepal.Length`, and `Petal.Width` values.
+- **Toggle traces** – if the plot contains multiple layers, clicking entries in the legend turns individual traces on and off.
+- **Download as image** – the camera icon saves the current view as a PNG file.
+  (This works most reliably in a web browser; in some embedded viewers it may be limited.)
+
+Some toolbar icons are shared between 2D and 3D plots, so a few tools may appear less useful here (for example, 2D lasso selection on a 3D surface). For this example, rotation, zooming, panning and hover tooltips are the most important interactions.
