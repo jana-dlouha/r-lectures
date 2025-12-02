@@ -1,0 +1,402 @@
+---
+title: "Exploring the Apple Fitness Dataset"
+code-fold: false
+toc-depth: 3
+---
+
+## 1. About the dataset
+
+This dataset contains **6,264 observations** collected from an Apple Watch and Fitbit-like device.  
+Each row represents *one time slice* of recorded physical activity and biometric signals.
+
+The variables describe:
+
+- demographic attributes (`age`, `gender`, `height`, `weight`)
+- physical activity metrics (`steps`, `distance`, `calories`)
+- heart-related measurements (`hear_rate`, `resting_heart`, `entropy_heart`, etc.)
+- computed features useful for modelling (`corr_heart_steps`, `steps_times_distance`)
+- the recorded *activity class* (`activity`), e.g. `"Lying"`, `"Sitting"`, `"Walking"`, `"Running"`…
+
+The dataset is ideal for demonstrating **linear regression**, **feature engineering**,  
+and exploratory visualisation because its variables are intuitive and quantitatively meaningful.
+
+---
+
+## 2. Download the data
+
+> **Download dataset (CSV):**
+> [`apple_watch_fitbit_data.csv`](../assets/data/apple_watch_fitbit_data.csv)
+
+---
+
+## 3. Load packages and data
+
+```{r}
+
+library(broom)
+library(modelr)
+library(tidymodels)
+library(tidyverse)
+
+apple <- read_csv("../assets/data/apple_watch_fitbit_data.csv")
+
+glimpse(apple)
+```
+## 4. Basic structure of the dataset
+
+The output of glimpse() shows 18 variables:
+
+* age, gender, height, weight
+* steps, hear_rate, distance, calories
+* entropy_heart, entropy_setps
+* resting_heart, norm_heart, sd_norm_heart
+* intensity_karvonen
+* corr_heart_steps (correlation between steps & heart rate over a time window)
+* steps_times_distance (engineered feature)
+* device (factor)
+* activity (categorical label)
+
+We will use these variables to introduce linear regression step by step — from simple models to more advanced ones (interactions, multivariate regression, transformations, diagnostics, etc.).
+
+## 5. First quick check: distributions
+
+```{r}
+apple %>%
+  select(steps, calories, hear_rate, distance) %>%
+  pivot_longer(everything()) %>%
+  ggplot(aes(value)) +
+  geom_histogram(bins = 40, fill = "#619CFF", color = "white") +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal(base_size = 14)
+```
+
+## Next steps
+
+In the following sections we will:
+
+1. Build the **first simple linear model** (calories ~ steps)
+2. Explore **meanings of coefficients**
+3. Add **multiple predictors**
+4. Diagnose the model (residuals, QQ plot)
+5. Try an **interaction term** and see how interpretation changes
+6. Reflect on *when linear regression stops making sense
+
+## Packages for regression in this chapter
+
+In this chapter we will work with a small, focused toolbox for regression models in R.
+
+- **Base `stats` (`lm()` function)**
+  Simple linear and multiple regression using base R. We use it as the core engine:
+  `lm(hear_rate ~ steps, data = apple)` is our starting point for modelling.
+
+- **`broom`**
+  Tidies model output into tibbles.
+  - `tidy()` – coefficients in a neat table,
+  - `augment()` – fitted values and residuals attached to the original data,
+  - `glance()` – one-row summary (R², AIC, …).
+  This makes regression results easy to combine with `dplyr` and `ggplot2`.
+
+- **Optional: `modelr`**
+  Helper functions like `add_predictions()` and `add_residuals()`.
+  We will mostly rely on `broom`, but you may encounter `modelr` in other tutorials.
+
+- **Optional: `tidymodels`**
+  A modern modelling framework with a unified grammar for regression, classification,
+  resampling, and tuning.
+  We briefly show how `linear_reg()` with engine `"lm"` reproduces the basic `lm()` workflow,
+  and how the same interface extends to more complex models.
+
+- **Optional: diagnostics packages (`performance`, `car`)**
+  For this R-focused course we keep diagnostics simple (plots and a few summary numbers).
+  For deeper regression diagnostics (multicollinearity, detailed ANOVA, assumption checks),
+  packages like `performance` or `car` are good next steps, especially in a statistics-oriented course.
+
+
+
+## 6. First simple model: calories ~ steps
+
+A natural first question:
+
+How strongly are burned calories related to the number of steps?
+
+We start with a simple linear regression:
+
+```{r}
+model_simple <- lm(calories ~ steps, data = apple)
+model_simple
+```
+
+The printed output shows the intercept and slope, but is not very tidy.
+We can use broom::tidy() instead:
+
+```{r}
+tidy(model_simple)
+```
+
+* the intercept is the expected calories when steps = 0,
+* the slope tells us how many calories increase on average when we add one step.
+
+(Because steps can be large, it may be more interpretable to rescale them, for example to
+thousands of steps, later in the chapter.)
+
+### 6.1 Visualising the simple regression line
+
+```{r}
+
+apple %>%
+  ggplot(aes(x = steps, y = calories)) +
+  geom_point(alpha = 0.3, color = "#619CFF") +
+  geom_smooth(method = "lm", se = TRUE, color = "#F8766D") +
+  labs(
+    title = "Simple linear regression: calories ~ steps",
+    x = "Steps",
+    y = "Calories"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+The regression line shows the average trend; the scatter of points around the line
+represents unexplained variability.
+
+⸻
+
+## 7. Using broom for a tidy workflow
+
+### 7.1 Coefficient table
+
+```{r}
+coef_table <- tidy(model_simple)
+coef_table
+```
+
+This gives a tibble with:
+* estimate – coefficient values,
+* std.error, statistic, p.value – classical inferential quantities.
+
+### 7.2 Model-level summary
+
+```{r}
+glance(model_simple)
+```
+
+Here we see:
+* r.squared – proportion of variance in calories explained by steps,
+* adj.r.squared – adjusted version,
+* sigma – residual standard deviation,
+* and other fit statistics.
+
+### 7.3 Augmenting the data with fitted values and residuals
+
+```{r}
+apple_aug <- augment(model_simple, data = apple)
+glimpse(apple_aug)
+```
+
+
+New columns:
+* .fitted – predicted calories from the model,
+* .resid – residuals (observed − fitted).
+
+We can use them for diagnostic plots.
+
+⸻
+
+## 8. Basic diagnostics for the simple model
+
+### 8.1 Residuals vs fitted values
+
+```{r}
+apple_aug %>%
+  ggplot(aes(x = .fitted, y = .resid)) +
+  geom_hline(yintercept = 0, color = "grey50") +
+  geom_point(alpha = 0.3, color = "#619CFF") +
+  labs(
+    title = "Residuals vs fitted values",
+    x = "Fitted calories",
+    y = "Residuals"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+We would like to see:
+* roughly constant spread of residuals across the range of fitted values,
+* no strong curvature.
+
+### 8.2 Histogram and Q–Q plot of residuals
+
+```{r}
+# Histogram
+apple_aug %>%
+  ggplot(aes(x = .resid)) +
+  geom_histogram(bins = 40, fill = "#619CFF", color = "white") +
+  labs(
+    title = "Distribution of residuals",
+    x = "Residual",
+    y = "Count"
+  ) +
+  theme_minimal(base_size = 14)
+
+# Q-Q plot
+apple_aug %>%
+  ggplot(aes(sample = .resid)) +
+  stat_qq(color = "#619CFF") +
+  stat_qq_line(color = "#F8766D") +
+  labs(
+    title = "Q-Q plot of residuals",
+    x = "Theoretical quantiles",
+    y = "Sample quantiles"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+These plots help us visually assess the normality assumption of residuals.
+
+::: callout-note
+
+Interpretation reminder
+
+For this course we keep diagnostics informal and visual.
+In a full statistics course, you would add formal tests (normality, homoscedasticity) and
+check for influential points.
+:::
+
+⸻
+
+## 9. Multiple regression: adding distance and heart rate
+
+Steps are not the only driver of calories. We can add more predictors:
+
+```{r}
+model_multi <- lm(calories ~ steps + distance + hear_rate, data = apple)
+
+tidy(model_multi)
+```
+
+
+
+The interpretation now becomes:
+* each coefficient is a partial effect,
+* for example, the slope for steps describes the effect of steps when distance and heart rate are held constant.
+
+Compare overall fit:
+
+glance(model_simple)[c("r.squared", "adj.r.squared")]
+glance(model_multi)[c("r.squared", "adj.r.squared")]
+
+::: callout-question
+
+Check your understanding
+* Did the multiple regression improve $R^2$ markedly?
+* Are all predictors statistically significant?
+* Would you keep all of them in a parsimonious model?
+
+Try to answer these questions before scrolling further or printing the summary in R.
+:::
+
+⸻
+
+
+## 10. Visualising model predictions
+
+To keep the plot in two dimensions, we can fix some variables and vary only one of them.
+For example, fix hear_rate at its median and see how predicted calories grow with steps.
+
+```{r}
+
+hear_median <- median(apple$hear_rate, na.rm = TRUE)
+
+pred_grid <- tibble(
+  steps     = seq(min(apple$steps), max(apple$steps), length.out = 100),
+  distance  = median(apple$distance, na.rm = TRUE),
+  hear_rate = hear_median
+)
+
+pred_grid <- pred_grid %>%
+  mutate(calories_pred = predict(model_multi, newdata = pred_grid))
+
+ggplot() +
+  geom_point(
+    data = apple,
+    aes(x = steps, y = calories),
+    alpha = 0.2,
+    color = "#B3CDE3"
+  ) +
+  geom_line(
+    data = pred_grid,
+    aes(x = steps, y = calories_pred),
+    color = "#F8766D",
+    linewidth = 1.2
+  ) +
+  labs(
+    title = "Predicted calories as a function of steps",
+    subtitle = "Distance and heart rate fixed at their medians",
+    x = "Steps",
+    y = "Calories"
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+This connects the algebraic model to a visual, more intuitive understanding.
+
+⸻
+
+## 11. Optional: interaction term
+
+You might suspect that the effect of steps is different for low vs high heart rate.
+This can be expressed by an interaction:
+
+model_interaction <- lm(calories ~ steps * hear_rate + distance, data = apple)
+tidy(model_interaction)
+
+The term steps:hear_rate captures how the slope of steps changes with heart rate.
+
+::: callout-tip
+
+When to use interactions?
+
+Use interaction terms when:
+* you expect the effect of one predictor to depend on the level of another predictor,
+* and you can explain such dependence substantively (not only because a p-value is small).
+:::
+
+⸻
+
+## 11. Optional: the same model via tidymodels
+
+This course focuses on lm(), but it is useful to see that the same idea fits into the
+tidymodels ecosystem.
+
+```{r}
+
+lm_spec <- linear_reg() %>%
+  set_engine("lm")
+
+lm_fit <- lm_spec %>%
+  fit(calories ~ steps + distance + hear_rate, data = apple)
+
+lm_fit
+
+# We can extract a tidy summary using:
+tidy(lm_fit)
+```
+
+Later, the same interface can be reused for regularised regression,
+tree-based models, and more — without changing the high-level syntax.
+
+⸻
+
+## 12. Summary
+
+In this chapter you have:
+
+* loaded and explored the Apple fitness dataset,
+* fitted a simple regression calories ~ steps,
+* interpreted slope, intercept, and $R^2$,
+* used broom to obtain tidy model summaries,
+* inspected residuals visually,
+* extended the model to multiple predictors and an optional interaction,
+* and seen how the same model looks in tidymodels.
+
+These are the core ingredients needed for building and understanding
+linear regression models in R. More advanced topics (regularisation, cross-validation,
+non-linear models) can be layered on top of this foundation.

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>regression – R Lectures</title>
+<title>Exploring the Apple Fitness Dataset – R Lectures</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -67,6 +101,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../shared/styles.css">
 </head>
@@ -111,17 +174,542 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#about-the-dataset" id="toc-about-the-dataset" class="nav-link active" data-scroll-target="#about-the-dataset">1. About the dataset</a></li>
+  <li><a href="#download-the-data" id="toc-download-the-data" class="nav-link" data-scroll-target="#download-the-data">2. Download the data</a></li>
+  <li><a href="#load-packages-and-data" id="toc-load-packages-and-data" class="nav-link" data-scroll-target="#load-packages-and-data">3. Load packages and data</a></li>
+  <li><a href="#basic-structure-of-the-dataset" id="toc-basic-structure-of-the-dataset" class="nav-link" data-scroll-target="#basic-structure-of-the-dataset">4. Basic structure of the dataset</a></li>
+  <li><a href="#first-quick-check-distributions" id="toc-first-quick-check-distributions" class="nav-link" data-scroll-target="#first-quick-check-distributions">5. First quick check: distributions</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#packages-for-regression-in-this-chapter" id="toc-packages-for-regression-in-this-chapter" class="nav-link" data-scroll-target="#packages-for-regression-in-this-chapter">Packages for regression in this chapter</a></li>
+  <li><a href="#first-simple-model-calories-steps" id="toc-first-simple-model-calories-steps" class="nav-link" data-scroll-target="#first-simple-model-calories-steps">6. First simple model: calories ~ steps</a>
+  <ul class="collapse">
+  <li><a href="#visualising-the-simple-regression-line" id="toc-visualising-the-simple-regression-line" class="nav-link" data-scroll-target="#visualising-the-simple-regression-line">6.1 Visualising the simple regression line</a></li>
+  </ul></li>
+  <li><a href="#using-broom-for-a-tidy-workflow" id="toc-using-broom-for-a-tidy-workflow" class="nav-link" data-scroll-target="#using-broom-for-a-tidy-workflow">7. Using broom for a tidy workflow</a>
+  <ul class="collapse">
+  <li><a href="#coefficient-table" id="toc-coefficient-table" class="nav-link" data-scroll-target="#coefficient-table">7.1 Coefficient table</a></li>
+  <li><a href="#model-level-summary" id="toc-model-level-summary" class="nav-link" data-scroll-target="#model-level-summary">7.2 Model-level summary</a></li>
+  <li><a href="#augmenting-the-data-with-fitted-values-and-residuals" id="toc-augmenting-the-data-with-fitted-values-and-residuals" class="nav-link" data-scroll-target="#augmenting-the-data-with-fitted-values-and-residuals">7.3 Augmenting the data with fitted values and residuals</a></li>
+  </ul></li>
+  <li><a href="#basic-diagnostics-for-the-simple-model" id="toc-basic-diagnostics-for-the-simple-model" class="nav-link" data-scroll-target="#basic-diagnostics-for-the-simple-model">8. Basic diagnostics for the simple model</a>
+  <ul class="collapse">
+  <li><a href="#residuals-vs-fitted-values" id="toc-residuals-vs-fitted-values" class="nav-link" data-scroll-target="#residuals-vs-fitted-values">8.1 Residuals vs fitted values</a></li>
+  <li><a href="#histogram-and-qq-plot-of-residuals" id="toc-histogram-and-qq-plot-of-residuals" class="nav-link" data-scroll-target="#histogram-and-qq-plot-of-residuals">8.2 Histogram and Q–Q plot of residuals</a></li>
+  </ul></li>
+  <li><a href="#multiple-regression-adding-distance-and-heart-rate" id="toc-multiple-regression-adding-distance-and-heart-rate" class="nav-link" data-scroll-target="#multiple-regression-adding-distance-and-heart-rate">9. Multiple regression: adding distance and heart rate</a></li>
+  <li><a href="#visualising-model-predictions" id="toc-visualising-model-predictions" class="nav-link" data-scroll-target="#visualising-model-predictions">10. Visualising model predictions</a></li>
+  <li><a href="#optional-interaction-term" id="toc-optional-interaction-term" class="nav-link" data-scroll-target="#optional-interaction-term">11. Optional: interaction term</a></li>
+  <li><a href="#optional-the-same-model-via-tidymodels" id="toc-optional-the-same-model-via-tidymodels" class="nav-link" data-scroll-target="#optional-the-same-model-via-tidymodels">11. Optional: the same model via tidymodels</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">12. Summary</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploring the Apple Fitness Dataset</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
+</header>
+
+
+<section id="about-the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-dataset">1. About the dataset</h2>
+<p>This dataset contains <strong>6,264 observations</strong> collected from an Apple Watch and Fitbit-like device.<br>
+Each row represents <em>one time slice</em> of recorded physical activity and biometric signals.</p>
+<p>The variables describe:</p>
+<ul>
+<li>demographic attributes (<code>age</code>, <code>gender</code>, <code>height</code>, <code>weight</code>)</li>
+<li>physical activity metrics (<code>steps</code>, <code>distance</code>, <code>calories</code>)</li>
+<li>heart-related measurements (<code>hear_rate</code>, <code>resting_heart</code>, <code>entropy_heart</code>, etc.)</li>
+<li>computed features useful for modelling (<code>corr_heart_steps</code>, <code>steps_times_distance</code>)</li>
+<li>the recorded <em>activity class</em> (<code>activity</code>), e.g.&nbsp;<code>"Lying"</code>, <code>"Sitting"</code>, <code>"Walking"</code>, <code>"Running"</code>…</li>
+</ul>
+<p>The dataset is ideal for demonstrating <strong>linear regression</strong>, <strong>feature engineering</strong>,<br>
+and exploratory visualisation because its variables are intuitive and quantitatively meaningful.</p>
+<hr>
+</section>
+<section id="download-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="download-the-data">2. Download the data</h2>
+<blockquote class="blockquote">
+<p><strong>Download dataset (CSV):</strong> <a href="../assets/data/apple_watch_fitbit_data.csv"><code>apple_watch_fitbit_data.csv</code></a></p>
+</blockquote>
+<hr>
+</section>
+<section id="load-packages-and-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-packages-and-data">3. Load packages and data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>apple <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../assets/data/apple_watch_fitbit_data.csv"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(apple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6,264
+Columns: 18
+$ age                  &lt;dbl&gt; 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 2…
+$ gender               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+$ height               &lt;dbl&gt; 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,…
+$ weight               &lt;dbl&gt; 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 6…
+$ steps                &lt;dbl&gt; 10.77143, 11.47532, 12.17922, 12.88312, 13.58701,…
+$ hear_rate            &lt;dbl&gt; 78.53130, 78.45339, 78.54083, 78.62826, 78.71569,…
+$ calories             &lt;dbl&gt; 0.3445329, 3.2876255, 9.4840000, 10.1545556, 10.8…
+$ distance             &lt;dbl&gt; 0.008326857, 0.008896346, 0.009465835, 0.01003532…
+$ entropy_heart        &lt;dbl&gt; 6.221612, 6.221612, 6.221612, 6.221612, 6.221612,…
+$ entropy_setps        &lt;dbl&gt; 6.116349, 6.116349, 6.116349, 6.116349, 6.116349,…
+$ resting_heart        &lt;dbl&gt; 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 5…
+$ corr_heart_steps     &lt;dbl&gt; 1.0000000, 1.0000000, 1.0000000, 1.0000000, 0.982…
+$ norm_heart           &lt;dbl&gt; 19.53130, 19.45339, 19.54083, 19.62826, 19.71569,…
+$ intensity_karvonen   &lt;dbl&gt; 0.1385199, 0.1379673, 0.1385874, 0.1392075, 0.139…
+$ sd_norm_heart        &lt;dbl&gt; 1.000000, 1.000000, 1.000000, 1.000000, 0.241567,…
+$ steps_times_distance &lt;dbl&gt; 0.08969215, 0.10208846, 0.11528650, 0.12928626, 0…
+$ device               &lt;chr&gt; "apple watch", "apple watch", "apple watch", "app…
+$ activity             &lt;chr&gt; "Lying", "Lying", "Lying", "Lying", "Lying", "Sit…</code></pre>
+</div>
+</div>
+</section>
+<section id="basic-structure-of-the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="basic-structure-of-the-dataset">4. Basic structure of the dataset</h2>
+<p>The output of glimpse() shows 18 variables:</p>
+<ul>
+<li>age, gender, height, weight</li>
+<li>steps, hear_rate, distance, calories</li>
+<li>entropy_heart, entropy_setps</li>
+<li>resting_heart, norm_heart, sd_norm_heart</li>
+<li>intensity_karvonen</li>
+<li>corr_heart_steps (correlation between steps &amp; heart rate over a time window)</li>
+<li>steps_times_distance (engineered feature)</li>
+<li>device (factor)</li>
+<li>activity (categorical label)</li>
+</ul>
+<p>We will use these variables to introduce linear regression step by step — from simple models to more advanced ones (interactions, multivariate regression, transformations, diagnostics, etc.).</p>
+</section>
+<section id="first-quick-check-distributions" class="level2">
+<h2 class="anchored" data-anchor-id="first-quick-check-distributions">5. First quick check: distributions</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>apple <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(steps, calories, hear_rate, distance) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(value)) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">fill =</span> <span class="st">"#619CFF"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>name, <span class="at">scales =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
+<p>In the following sections we will:</p>
+<ol type="1">
+<li>Build the <strong>first simple linear model</strong> (calories ~ steps)</li>
+<li>Explore <strong>meanings of coefficients</strong></li>
+<li>Add <strong>multiple predictors</strong></li>
+<li>Diagnose the model (residuals, QQ plot)</li>
+<li>Try an <strong>interaction term</strong> and see how interpretation changes</li>
+<li>Reflect on *when linear regression stops making sense</li>
+</ol>
+</section>
+<section id="packages-for-regression-in-this-chapter" class="level2">
+<h2 class="anchored" data-anchor-id="packages-for-regression-in-this-chapter">Packages for regression in this chapter</h2>
+<p>In this chapter we will work with a small, focused toolbox for regression models in R.</p>
+<ul>
+<li><p><strong>Base <code>stats</code> (<code>lm()</code> function)</strong> Simple linear and multiple regression using base R. We use it as the core engine: <code>lm(hear_rate ~ steps, data = apple)</code> is our starting point for modelling.</p></li>
+<li><p><strong><code>broom</code></strong> Tidies model output into tibbles.</p>
+<ul>
+<li><code>tidy()</code> – coefficients in a neat table,</li>
+<li><code>augment()</code> – fitted values and residuals attached to the original data,</li>
+<li><code>glance()</code> – one-row summary (R², AIC, …). This makes regression results easy to combine with <code>dplyr</code> and <code>ggplot2</code>.</li>
+</ul></li>
+<li><p><strong>Optional: <code>modelr</code></strong> Helper functions like <code>add_predictions()</code> and <code>add_residuals()</code>. We will mostly rely on <code>broom</code>, but you may encounter <code>modelr</code> in other tutorials.</p></li>
+<li><p><strong>Optional: <code>tidymodels</code></strong> A modern modelling framework with a unified grammar for regression, classification, resampling, and tuning. We briefly show how <code>linear_reg()</code> with engine <code>"lm"</code> reproduces the basic <code>lm()</code> workflow, and how the same interface extends to more complex models.</p></li>
+<li><p><strong>Optional: diagnostics packages (<code>performance</code>, <code>car</code>)</strong> For this R-focused course we keep diagnostics simple (plots and a few summary numbers). For deeper regression diagnostics (multicollinearity, detailed ANOVA, assumption checks), packages like <code>performance</code> or <code>car</code> are good next steps, especially in a statistics-oriented course.</p></li>
+</ul>
+</section>
+<section id="first-simple-model-calories-steps" class="level2">
+<h2 class="anchored" data-anchor-id="first-simple-model-calories-steps">6. First simple model: calories ~ steps</h2>
+<p>A natural first question:</p>
+<p>How strongly are burned calories related to the number of steps?</p>
+<p>We start with a simple linear regression:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model_simple <span class="ot">&lt;-</span> <span class="fu">lm</span>(calories <span class="sc">~</span> steps, <span class="at">data =</span> apple)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>model_simple</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = calories ~ steps, data = apple)
+
+Coefficients:
+(Intercept)        steps  
+   22.84232     -0.03076  </code></pre>
+</div>
+</div>
+<p>The printed output shows the intercept and slope, but is not very tidy. We can use broom::tidy() instead:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model_simple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)  22.8      0.372        61.4 0       
+2 steps        -0.0308   0.00150     -20.5 1.37e-90</code></pre>
+</div>
+</div>
+<ul>
+<li>the intercept is the expected calories when steps = 0,</li>
+<li>the slope tells us how many calories increase on average when we add one step.</li>
+</ul>
+<p>(Because steps can be large, it may be more interpretable to rescale them, for example to thousands of steps, later in the chapter.)</p>
+<section id="visualising-the-simple-regression-line" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-the-simple-regression-line">6.1 Visualising the simple regression line</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>apple <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> steps, <span class="at">y =</span> calories)) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">color =</span> <span class="st">"#619CFF"</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"#F8766D"</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Simple linear regression: calories ~ steps"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Steps"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Calories"</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The regression line shows the average trend; the scatter of points around the line represents unexplained variability.</p>
+<p>⸻</p>
+</section>
+</section>
+<section id="using-broom-for-a-tidy-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="using-broom-for-a-tidy-workflow">7. Using broom for a tidy workflow</h2>
+<section id="coefficient-table" class="level3">
+<h3 class="anchored" data-anchor-id="coefficient-table">7.1 Coefficient table</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>coef_table <span class="ot">&lt;-</span> <span class="fu">tidy</span>(model_simple)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>coef_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)  22.8      0.372        61.4 0       
+2 steps        -0.0308   0.00150     -20.5 1.37e-90</code></pre>
+</div>
+</div>
+<p>This gives a tibble with: * estimate – coefficient values, * std.error, statistic, p.value – classical inferential quantities.</p>
+</section>
+<section id="model-level-summary" class="level3">
+<h3 class="anchored" data-anchor-id="model-level-summary">7.2 Model-level summary</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glance</span>(model_simple)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df  logLik    AIC    BIC
+      &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+1    0.0630        0.0628  26.4      421. 1.37e-90     1 -29401. 58807. 58827.
+# ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+</div>
+</div>
+<p>Here we see: * r.squared – proportion of variance in calories explained by steps, * adj.r.squared – adjusted version, * sigma – residual standard deviation, * and other fit statistics.</p>
+</section>
+<section id="augmenting-the-data-with-fitted-values-and-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="augmenting-the-data-with-fitted-values-and-residuals">7.3 Augmenting the data with fitted values and residuals</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>apple_aug <span class="ot">&lt;-</span> <span class="fu">augment</span>(model_simple, <span class="at">data =</span> apple)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(apple_aug)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 6,264
+Columns: 24
+$ age                  &lt;dbl&gt; 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 2…
+$ gender               &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+$ height               &lt;dbl&gt; 168, 168, 168, 168, 168, 168, 168, 168, 168, 168,…
+$ weight               &lt;dbl&gt; 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 65.4, 6…
+$ steps                &lt;dbl&gt; 10.77143, 11.47532, 12.17922, 12.88312, 13.58701,…
+$ hear_rate            &lt;dbl&gt; 78.53130, 78.45339, 78.54083, 78.62826, 78.71569,…
+$ calories             &lt;dbl&gt; 0.3445329, 3.2876255, 9.4840000, 10.1545556, 10.8…
+$ distance             &lt;dbl&gt; 0.008326857, 0.008896346, 0.009465835, 0.01003532…
+$ entropy_heart        &lt;dbl&gt; 6.221612, 6.221612, 6.221612, 6.221612, 6.221612,…
+$ entropy_setps        &lt;dbl&gt; 6.116349, 6.116349, 6.116349, 6.116349, 6.116349,…
+$ resting_heart        &lt;dbl&gt; 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 5…
+$ corr_heart_steps     &lt;dbl&gt; 1.0000000, 1.0000000, 1.0000000, 1.0000000, 0.982…
+$ norm_heart           &lt;dbl&gt; 19.53130, 19.45339, 19.54083, 19.62826, 19.71569,…
+$ intensity_karvonen   &lt;dbl&gt; 0.1385199, 0.1379673, 0.1385874, 0.1392075, 0.139…
+$ sd_norm_heart        &lt;dbl&gt; 1.000000, 1.000000, 1.000000, 1.000000, 0.241567,…
+$ steps_times_distance &lt;dbl&gt; 0.08969215, 0.10208846, 0.11528650, 0.12928626, 0…
+$ device               &lt;chr&gt; "apple watch", "apple watch", "apple watch", "app…
+$ activity             &lt;chr&gt; "Lying", "Lying", "Lying", "Lying", "Lying", "Sit…
+$ .fitted              &lt;dbl&gt; 22.51096, 22.48930, 22.46765, 22.44599, 22.42434,…
+$ .resid               &lt;dbl&gt; -22.166424, -19.201677, -12.983649, -12.291439, -…
+$ .hat                 &lt;dbl&gt; 0.0001910351, 0.0001905893, 0.0001901468, 0.00018…
+$ .sigma               &lt;dbl&gt; 26.43843, 26.43880, 26.43941, 26.43946, 26.43951,…
+$ .cooksd              &lt;dbl&gt; 6.717221e-05, 5.028770e-05, 2.293860e-05, 2.05103…
+$ .std.resid           &lt;dbl&gt; -0.8385168, -0.7263654, -0.4911483, -0.4649632, -…</code></pre>
+</div>
+</div>
+<p>New columns: * .fitted – predicted calories from the model, * .resid – residuals (observed − fitted).</p>
+<p>We can use them for diagnostic plots.</p>
+<p>⸻</p>
+</section>
+</section>
+<section id="basic-diagnostics-for-the-simple-model" class="level2">
+<h2 class="anchored" data-anchor-id="basic-diagnostics-for-the-simple-model">8. Basic diagnostics for the simple model</h2>
+<section id="residuals-vs-fitted-values" class="level3">
+<h3 class="anchored" data-anchor-id="residuals-vs-fitted-values">8.1 Residuals vs fitted values</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>apple_aug <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .fitted, <span class="at">y =</span> .resid)) <span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"grey50"</span>) <span class="sc">+</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">color =</span> <span class="st">"#619CFF"</span>) <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Residuals vs fitted values"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Fitted calories"</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Residuals"</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We would like to see: * roughly constant spread of residuals across the range of fitted values, * no strong curvature.</p>
+</section>
+<section id="histogram-and-qq-plot-of-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="histogram-and-qq-plot-of-residuals">8.2 Histogram and Q–Q plot of residuals</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histogram</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>apple_aug <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .resid)) <span class="sc">+</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">40</span>, <span class="at">fill =</span> <span class="st">"#619CFF"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution of residuals"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Residual"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Count"</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plot</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>apple_aug <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">sample =</span> .resid)) <span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq</span>(<span class="at">color =</span> <span class="st">"#619CFF"</span>) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_qq_line</span>(<span class="at">color =</span> <span class="st">"#F8766D"</span>) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Q-Q plot of residuals"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Theoretical quantiles"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Sample quantiles"</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These plots help us visually assess the normality assumption of residuals.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Interpretation reminder</p>
+<p>For this course we keep diagnostics informal and visual. In a full statistics course, you would add formal tests (normality, homoscedasticity) and check for influential points.</p>
+</div>
+</div>
+<p>⸻</p>
+</section>
+</section>
+<section id="multiple-regression-adding-distance-and-heart-rate" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-regression-adding-distance-and-heart-rate">9. Multiple regression: adding distance and heart rate</h2>
+<p>Steps are not the only driver of calories. We can add more predictors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>model_multi <span class="ot">&lt;-</span> <span class="fu">lm</span>(calories <span class="sc">~</span> steps <span class="sc">+</span> distance <span class="sc">+</span> hear_rate, <span class="at">data =</span> apple)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model_multi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  27.9      1.04        27.0  1.34e-151
+2 steps        -0.0264   0.00147    -17.9  5.17e- 70
+3 distance      0.136    0.00707     19.3  1.12e- 80
+4 hear_rate    -0.0866   0.0114      -7.57 4.28e- 14</code></pre>
+</div>
+</div>
+<p>The interpretation now becomes: * each coefficient is a partial effect, * for example, the slope for steps describes the effect of steps when distance and heart rate are held constant.</p>
+<p>Compare overall fit:</p>
+<p>glance(model_simple)[c(“r.squared”, “adj.r.squared”)] glance(model_multi)[c(“r.squared”, “adj.r.squared”)]</p>
+<div class="callout-question">
+<p>Check your understanding * Did the multiple regression improve <span class="math inline">\(R^2\)</span> markedly? * Are all predictors statistically significant? * Would you keep all of them in a parsimonious model?</p>
+<p>Try to answer these questions before scrolling further or printing the summary in R.</p>
+</div>
+<p>⸻</p>
+</section>
+<section id="visualising-model-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-model-predictions">10. Visualising model predictions</h2>
+<p>To keep the plot in two dimensions, we can fix some variables and vary only one of them. For example, fix hear_rate at its median and see how predicted calories grow with steps.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>hear_median <span class="ot">&lt;-</span> <span class="fu">median</span>(apple<span class="sc">$</span>hear_rate, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>pred_grid <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">steps     =</span> <span class="fu">seq</span>(<span class="fu">min</span>(apple<span class="sc">$</span>steps), <span class="fu">max</span>(apple<span class="sc">$</span>steps), <span class="at">length.out =</span> <span class="dv">100</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">distance  =</span> <span class="fu">median</span>(apple<span class="sc">$</span>distance, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">hear_rate =</span> hear_median</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>pred_grid <span class="ot">&lt;-</span> pred_grid <span class="sc">%&gt;%</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">calories_pred =</span> <span class="fu">predict</span>(model_multi, <span class="at">newdata =</span> pred_grid))</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> apple,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> steps, <span class="at">y =</span> calories),</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.2</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"#B3CDE3"</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> pred_grid,</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> steps, <span class="at">y =</span> calories_pred),</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"#F8766D"</span>,</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.2</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Predicted calories as a function of steps"</span>,</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Distance and heart rate fixed at their medians"</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Steps"</span>,</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Calories"</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="regression_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This connects the algebraic model to a visual, more intuitive understanding.</p>
+<p>⸻</p>
+</section>
+<section id="optional-interaction-term" class="level2">
+<h2 class="anchored" data-anchor-id="optional-interaction-term">11. Optional: interaction term</h2>
+<p>You might suspect that the effect of steps is different for low vs high heart rate. This can be expressed by an interaction:</p>
+<p>model_interaction &lt;- lm(calories ~ steps * hear_rate + distance, data = apple) tidy(model_interaction)</p>
+<p>The term steps:hear_rate captures how the slope of steps changes with heart rate.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When to use interactions?</p>
+<p>Use interaction terms when: * you expect the effect of one predictor to depend on the level of another predictor, * and you can explain such dependence substantively (not only because a p-value is small).</p>
+</div>
+</div>
+<p>⸻</p>
+</section>
+<section id="optional-the-same-model-via-tidymodels" class="level2">
+<h2 class="anchored" data-anchor-id="optional-the-same-model-via-tidymodels">11. Optional: the same model via tidymodels</h2>
+<p>This course focuses on lm(), but it is useful to see that the same idea fits into the tidymodels ecosystem.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lm"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>lm_fit <span class="ot">&lt;-</span> lm_spec <span class="sc">%&gt;%</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(calories <span class="sc">~</span> steps <span class="sc">+</span> distance <span class="sc">+</span> hear_rate, <span class="at">data =</span> apple)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>lm_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>parsnip model object
+
+
+Call:
+stats::lm(formula = calories ~ steps + distance + hear_rate, 
+    data = data)
+
+Coefficients:
+(Intercept)        steps     distance    hear_rate  
+   27.93654     -0.02639      0.13638     -0.08659  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can extract a tidy summary using:</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lm_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  27.9      1.04        27.0  1.34e-151
+2 steps        -0.0264   0.00147    -17.9  5.17e- 70
+3 distance      0.136    0.00707     19.3  1.12e- 80
+4 hear_rate    -0.0866   0.0114      -7.57 4.28e- 14</code></pre>
+</div>
+</div>
+<p>Later, the same interface can be reused for regularised regression, tree-based models, and more — without changing the high-level syntax.</p>
+<p>⸻</p>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">12. Summary</h2>
+<p>In this chapter you have:</p>
+<ul>
+<li>loaded and explored the Apple fitness dataset,</li>
+<li>fitted a simple regression calories ~ steps,</li>
+<li>interpreted slope, intercept, and <span class="math inline">\(R^2\)</span>,</li>
+<li>used broom to obtain tidy model summaries,</li>
+<li>inspected residuals visually,</li>
+<li>extended the model to multiple predictors and an optional interaction,</li>
+<li>and seen how the same model looks in tidymodels.</li>
+</ul>
+<p>These are the core ingredients needed for building and understanding linear regression models in R. More advanced topics (regularisation, cross-validation, non-linear models) can be layered on top of this foundation.</p>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

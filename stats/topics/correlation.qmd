@@ -1,0 +1,279 @@
+
+---
+title: "Correlation in R"
+code-fold: false
+---
+
+This page walks through several ways of working with correlations in R,
+using two small teaching datasets:
+
+- an **ice-cream experiment** (puzzle vs. video game scores)
+- a **US crime dataset** (crime rate, demographics, wages, etc.)
+
+The goal is not only to compute a single `cor()` value, but to learn
+how to:
+
+- compute Pearson, Spearman, and Kendall correlations,
+- test correlations with `cor.test()`,
+- compute correlations **separately by groups**,
+- explore larger sets of variables with **correlation matrices** and
+  helper functions.
+
+## Setup
+
+```{r}
+library(tidyverse)
+
+
+# install.packages("corrplot")
+# install.packages("lares")
+library(corrplot)
+library(lares)
+
+# Load datasets
+# Adjust paths to match your project structure
+icecream <- read_csv("../assets/data/ice_cream.csv")
+crime    <- read_csv("../assets/data/crime.csv")
+```
+
+---
+
+## 1. Ice-cream experiment: basic correlations
+
+In this dataset, participants completed:
+
+- a **puzzle task** (`puzzle`), and  
+- a **video game task** (`video`).  
+
+We start with the simplest question:
+
+> How strongly are puzzle scores and video game scores related?
+
+### 1.1 Pearson correlation
+
+```{r}
+cor(icecream$puzzle, icecream$video)
+```
+
+You can also use the formula interface with `with()`:
+
+```{r}
+with(icecream, cor(puzzle, video))
+```
+
+### 1.2 Visualising the relationship
+
+Base R plot version (quick and simple):
+
+```{r}
+plot(
+  icecream$puzzle, icecream$video,
+  main = "Correlation between puzzle score\nand video game score",
+  xlab = "Puzzle score",
+  ylab = "Video game score",
+  sub  = paste0("r = ", round(cor(icecream$puzzle, icecream$video), 2))
+)
+```
+
+> **Bonus task:**
+> Recreate this plot using **ggplot2** instead of base R.
+
+### 1.3 Non-parametric correlations
+
+Sometimes variables are not normally distributed or contain outliers.
+Two common **rank-based** alternatives are:
+
+- **Spearman’s rho**
+- **Kendall’s tau**
+
+```{r}
+# Spearman's rank correlation
+cor(icecream$puzzle, icecream$video, method = "spearman")
+
+# Kendall's tau
+cor(icecream$puzzle, icecream$video, method = "kendall")
+```
+
+> **Reflection prompt:**  
+> Compare the Pearson, Spearman, and Kendall coefficients.  
+> Are they similar, or do ranks tell a different story?
+
+---
+
+## 2. Crime data: correlation matrices and tests
+
+The `crime` dataset contains several numeric variables such as:
+
+- `CrimeRate` – crime per population  
+- `Males` – number of males in the labour force  
+- `Wage` – average wage  
+- `StateSize` – size of the state, and many others.
+
+### 2.1 Simple correlation matrix
+
+We can compute a correlation matrix for a small subset of variables:
+
+```{r}
+crime %>%
+  select(CrimeRate, Males, Wage) %>%
+  cor()
+```
+
+Rounded for nicer printing:
+
+```{r}
+crime %>%
+  select(CrimeRate, Males, Wage) %>%
+  cor() %>%
+  round(2)
+```
+
+### 2.2 Pairwise scatterplots
+
+A quick way to **visualise all pairwise relationships** is `pairs()`:
+
+```{r}
+crime %>%
+  select(CrimeRate, Males, Wage) %>%
+  pairs()
+```
+
+> **Bonus task:**
+> Which pairs look most linear and which look weak or non-linear?
+
+### 2.3 Testing correlations: `cor.test()`
+
+`cor()` only gives you the coefficient.  
+Use `cor.test()` when you want a **hypothesis test** and a **confidence interval**.
+
+```{r}
+# Test correlation between Males and Wage
+cor.test(crime$Males, crime$Wage)
+
+# Test correlation between Males and CrimeRate
+cor.test(crime$Males, crime$CrimeRate)
+```
+
+
+---
+
+## 3. Correlations by group
+
+Sometimes you do not just want “one correlation for everybody”, but
+separate correlations **within subgroups**.
+
+In the `crime` data, variable `MoreMales` indicates whether the state
+has a particularly high number of males.
+
+### 3.1 Grouped correlation (summarise version)
+
+Here we compute the correlation between `StateSize` and `Education`
+**separately** for each value of `MoreMales`:
+
+```{r}
+crime %>%
+  select(CrimeRate, StateSize, Education, Wage, MoreMales) %>%
+  group_by(MoreMales) %>%
+  summarise(
+    cor_StateSize_Education = cor(StateSize, Education, use = "complete.obs")
+  )
+```
+
+This approach is:
+
+- readable,  
+- uses only `dplyr`,  
+- easy to adapt to other variable pairs.
+
+### 3.2 Grouped correlation (nested + purrr version)
+
+The same idea, but written in a more functional style:
+
+```{r}
+library(purrr)
+library(broom)
+
+crime %>%
+  select(CrimeRate, StateSize, Education, Wage, MoreMales) %>%
+  group_by(MoreMales) %>%
+  nest() %>%
+  mutate(
+    cor_test = map(
+      data,
+      ~ cor.test(.x$StateSize, .x$Education, use = "complete.obs")
+    ),
+    tidy_result = map(cor_test, broom::tidy)
+  ) %>%
+  select(MoreMales, tidy_result) %>%
+  unnest(tidy_result)
+```
+
+- `nest()` creates a small tibble for each group in column `data`.  
+- `map_dbl()` applies `cor()` inside each small dataset.
+
+> This pattern is a gentle introduction to the “split–apply–combine” idea using **nested data frames**.
+
+---
+
+## 4. Visualising correlations in larger sets of variables
+
+### 4.1 Correlation heatmap with `corrplot`
+
+For many variables, a correlation matrix is easier to read as a
+**heatmap**.
+
+The next block:
+
+1. Keeps only numeric variables.
+2. Drops variables with missing values or zero variance.
+3. Randomly picks 10 numeric variables (just for demo).
+4. Computes a correlation matrix.
+5. Plots it with `corrplot()` and hierarchical clustering.
+
+```{r}
+set.seed(123)  # for reproducible sampling of columns
+
+crime %>%
+  select_if(is.numeric) %>%               # keep only numeric variables
+  select_if(~ !any(is.na(.))) %>%        # drop variables with any missing values
+  select_if(~ sd(.) != 0) %>%            # drop variables with zero variance
+  select(sample(names(.), size = 10)) %>%
+  cor(use = "complete.obs") %>%          # row-wise removal of missing values
+  corrplot::corrplot(order = "hclust")   # cluster similar variables
+```
+
+> **Bonus task:**
+> Choose your own subset of variables and interpret at least three interesting pairs.
+
+### 4.2 “Smart” correlation helpers from `lares`
+
+The `lares` package provides convenience functions
+for quickly exploring correlations in a dataset.
+
+#### 4.2.1 Top correlated pairs
+
+```{r}
+crime %>%
+  select(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) %>%
+  lares::corr_cross(pvalue = 0.01, top = 10)
+```
+
+Same function, but **without plotting**, returning only a table:
+
+```{r}
+crime %>%
+  select(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) %>%
+  lares::corr_cross(pvalue = 0.01, top = 10, plot = FALSE)
+```
+
+#### 4.2.2 Correlations with a selected variable
+
+You can also focus on correlations with one target variable,
+for example `CrimeRate`:
+
+```{r}
+crime %>%
+  select(CrimeRate, Youth, Education, Males, StateSize, Wage, BelowWage) %>%
+  lares::corr_var(var = CrimeRate, top = 15)
+```
+
