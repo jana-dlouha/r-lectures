@@ -24,7 +24,7 @@ p <- corr %>%
 p
 
 ggsave(
-    "ggplot-gallery/assets/img/corrplot.png",
+    "ggplot-gallery/assets/img/correlogram.png",
     plot = p,
     width = 7, height = 6, dpi = 150
 )

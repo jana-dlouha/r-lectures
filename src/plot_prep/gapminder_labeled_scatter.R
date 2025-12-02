@@ -12,29 +12,20 @@
 
 # Load packages ---------------------------------------------------------------
 library(tidyverse)
-library(gapminder) # provides the built-in gapminder dataset
 library(ggrepel)   # provides geom_text_repel() for non-overlapping labels
 
-# Load prepared dataset -------------------------------------------------------
-# If a cleaned CSV exists in src/data/, use it (keeps workflow consistent).
-# Otherwise fall back to the built-in gapminder dataset.
-gapminder::gapminder
-
-# Prepare a readable subset ---------------------------------------------------
-# We pick one year and one continent so labels stay legible.
-df <- gapminder %>%
-  filter(year == 2007, continent == "Europe") %>%
-  drop_na()
+df <- read_csv2("src/data/gapminder_extended.csv")
 
 # Build the base plot (no theme yet) ------------------------------------------
 # x = GDP per capita (log scale later), y = life expectancy.
-p <- ggplot(df, aes(x = gdpPercap, y = lifeExp, label = country)) +
+# Color - try color by language_group, region_europe, econ_block
+p <- ggplot(df, aes(x = gdpPercap, y = lifeExp, label = country, color = region_europe)) +
 
   # Step 1: basic scatterplot
   geom_point() +
 
   # Step 2: add labels with ggrepel (avoids overlaps)
-  geom_text_repel(size = 3, max.overlaps = Inf) +
+  geom_label_repel(size = 4, max.overlaps = Inf) +
 
   # Step 3: polish for teaching clarity
   scale_x_log10() +
@@ -44,7 +35,8 @@ p <- ggplot(df, aes(x = gdpPercap, y = lifeExp, label = country)) +
     title = "Gapminder 2007: Europe",
     subtitle = "Each point is one country"
   ) +
-  theme_minimal(base_size = 14)
+  theme_minimal(base_size = 14) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#7D3C98", "#3C3C3C"))
 
 # Save final plot --------------------------------------------------------------
 ggsave(
