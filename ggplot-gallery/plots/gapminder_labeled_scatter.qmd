@@ -26,13 +26,15 @@ library(gapminder)
 ```
 
 ```{r data}
-# Load prepared dataset
-gapminder::gapminder
 
 # Keep a readable subset for labelling
-df <- gapminder %>%
-  filter(year == 2007, continent == "Europe") %>%
-  drop_na()
+df <- gapminder::gapminder %>%
+    filter(year == 2007) %>%
+    group_by(continent) %>%
+    slice_sample(n = 5) %>%
+    ungroup()
+
+df
 ```
 
 ## Step 1: Basic scatterplot
@@ -57,12 +59,22 @@ Hints:
 - `size` increases visibility.
 - `alpha` adds transparency (helps if points overlap).
 
-## Step 3: Add country labels (ggrepel)
+## Step 3a: Add country labels (ggrepel)
 
-```{r step3}
+```{r step3a}
 ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
   geom_point(size = 2, alpha = 0.8) +
-  geom_text_repel(size = 3)
+  geom_label(size = 3)
+```
+
+
+
+## Step 3b: Add country labels (ggrepel)
+
+```{r step3b}
+ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+  geom_point(size = 2, alpha = 0.8) +
+  geom_label_repel(size = 3)
 ```
 
 Hints:
@@ -74,7 +86,7 @@ Hints:
 ```{r step4}
 ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
   geom_point(size = 2, alpha = 0.8) +
-  geom_text_repel(size = 3) +
+  geom_label_repel(size = 3) +
   scale_x_log10()
 ```
 
@@ -92,7 +104,7 @@ Hints:
 ```{r step5}
 ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
   geom_point(size = 2, alpha = 0.8) +
-  geom_text_repel(size = 3, max.overlaps = Inf) +
+  geom_label_repel(size = 3, max.overlaps = Inf) +
   scale_x_log10() +
   labs(
     x = "GDP per capita (log scale)",
@@ -105,17 +117,17 @@ ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
 
 ---
 
-## Hidden solution
+## Colors
 
 ```{r solution}
-ggplot(df, aes(gdpPercap, lifeExp, label = country)) +
+ggplot(df, aes(gdpPercap, lifeExp, label = country, color = continent)) +
   geom_point(size = 2, alpha = 0.8) +
-  geom_text_repel(size = 3, max.overlaps = Inf) +
+  geom_label_repel(size = 3, max.overlaps = Inf) +
   scale_x_log10() +
   labs(
     x = "GDP per capita (log scale)",
     y = "Life expectancy (years)",
-    title = "Gapminder 2007: Europe",
+    title = "Gapminder 2007",
     subtitle = "Each point is one country"
   ) +
   theme_minimal(base_size = 14)

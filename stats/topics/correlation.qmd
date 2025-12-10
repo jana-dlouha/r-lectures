@@ -190,22 +190,18 @@ This approach is:
 The same idea, but written in a more functional style:
 
 ```{r}
-library(purrr)
-library(broom)
 
 crime %>%
   select(CrimeRate, StateSize, Education, Wage, MoreMales) %>%
   group_by(MoreMales) %>%
   nest() %>%
   mutate(
-    cor_test = map(
+    cor_StateSize_Education = map_dbl(
       data,
-      ~ cor.test(.x$StateSize, .x$Education, use = "complete.obs")
-    ),
-    tidy_result = map(cor_test, broom::tidy)
-  ) %>%
-  select(MoreMales, tidy_result) %>%
-  unnest(tidy_result)
+      ~ cor(.x$StateSize, .x$Education, use = "complete.obs")
+    )
+  )
+
 ```
 
 - `nest()` creates a small tibble for each group in column `data`.  

@@ -47,18 +47,29 @@ Each topic combines explanation, hands-on code, and a foldable solution, so you 
   </div>
 </div>
 
-<!-- Group comparisons -->
-<div class="gallery-card">
-  <a href="topics/ttest_anova.html">
-    <img src="assets/img/placeholder.png"
-         alt="Group comparison in R">
-  </a>
-  <div class="gallery-title">Group Comparisons</div>
-  <div class="gallery-meta">Level 1 • t-tests & ANOVA</div>
-  <div class="gallery-desc">
-    Compare groups using t-tests and ANOVA, inspect effect sizes, and visualize differences.
-  </div>
-</div>
+[//]: # (<!-- Group comparisons -->)
+
+[//]: # (<div class="gallery-card">)
+
+[//]: # (  <a href="topics/ttest_anova.html">)
+
+[//]: # (    <img src="assets/img/placeholder.png")
+
+[//]: # (         alt="Group comparison in R">)
+
+[//]: # (  </a>)
+
+[//]: # (  <div class="gallery-title">Group Comparisons</div>)
+
+[//]: # (  <div class="gallery-meta">Level 1 • t-tests & ANOVA</div>)
+
+[//]: # (  <div class="gallery-desc">)
+
+[//]: # (    Compare groups using t-tests and ANOVA, inspect effect sizes, and visualize differences.)
+
+[//]: # (  </div>)
+
+[//]: # (</div>)
 
 <!-- Probability & simulation -->
 <div class="gallery-card">
@@ -73,17 +84,28 @@ Each topic combines explanation, hands-on code, and a foldable solution, so you 
   </div>
 </div>
 
-<!-- Power & sample size -->
-<div class="gallery-card">
-  <a href="topics/power_sample_size.html">
-    <img src="assets/img/placeholder.png"
-         alt="Statistical power in R">
-  </a>
-  <div class="gallery-title">Power & Sample Size</div>
-  <div class="gallery-meta">Level 1 • planning studies</div>
-  <div class="gallery-desc">
-    Understand statistical power, compute required sample sizes, and explore effect size scenarios.
-  </div>
-</div>
+[//]: # (<!-- Power & sample size -->)
+
+[//]: # (<div class="gallery-card">)
+
+[//]: # (  <a href="topics/power_sample_size.html">)
+
+[//]: # (    <img src="assets/img/placeholder.png")
+
+[//]: # (         alt="Statistical power in R">)
+
+[//]: # (  </a>)
+
+[//]: # (  <div class="gallery-title">Power & Sample Size</div>)
+
+[//]: # (  <div class="gallery-meta">Level 1 • planning studies</div>)
+
+[//]: # (  <div class="gallery-desc">)
+
+[//]: # (    Understand statistical power, compute required sample sizes, and explore effect size scenarios.)
+
+[//]: # (  </div>)
+
+[//]: # (</div>)
 
 </div>
