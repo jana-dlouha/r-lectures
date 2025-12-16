@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Theme showcase: one plot, many looks – R Lectures</title>
+<title>Machine Learning &amp; Spam Detection – R Lectures</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -149,17 +115,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
-  <ul>
-  <li><a href="#data" id="toc-data" class="nav-link active" data-scroll-target="#data">Data</a></li>
-  <li><a href="#default-look-no-theme-added" id="toc-default-look-no-theme-added" class="nav-link" data-scroll-target="#default-look-no-theme-added">Default look (no theme added)</a></li>
-  <li><a href="#theme_gray" id="toc-theme_gray" class="nav-link" data-scroll-target="#theme_gray">theme_gray()</a></li>
-  <li><a href="#theme_minimal" id="toc-theme_minimal" class="nav-link" data-scroll-target="#theme_minimal">theme_minimal()</a></li>
-  <li><a href="#theme_classic" id="toc-theme_classic" class="nav-link" data-scroll-target="#theme_classic">theme_classic()</a></li>
-  <li><a href="#theme_bw" id="toc-theme_bw" class="nav-link" data-scroll-target="#theme_bw">theme_bw()</a></li>
-  <li><a href="#theme_light" id="toc-theme_light" class="nav-link" data-scroll-target="#theme_light">theme_light()</a></li>
-  <li><a href="#theme_linedraw" id="toc-theme_linedraw" class="nav-link" data-scroll-target="#theme_linedraw">theme_linedraw()</a></li>
-  <li><a href="#theme_dark" id="toc-theme_dark" class="nav-link" data-scroll-target="#theme_dark">theme_dark()</a></li>
-  <li><a href="#theme_void" id="toc-theme_void" class="nav-link" data-scroll-target="#theme_void">theme_void()</a></li>
+  <ul class="collapse">
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#what-you-will-learn" id="toc-what-you-will-learn" class="nav-link" data-scroll-target="#what-you-will-learn">What you will learn</a></li>
+  <li><a href="#sections" id="toc-sections" class="nav-link" data-scroll-target="#sections">Sections</a></li>
+  <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
   </ul>
 </nav>
     </div>
@@ -168,7 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Theme showcase: one plot, many looks</h1>
+<h1 class="title">Machine Learning &amp; Spam Detection</h1>
 </div>
 
 
@@ -185,190 +146,90 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This page shows how different <strong>ggplot2 themes</strong> change the same plot. We keep the data and geoms fixed, and only swap the theme.<br>
-Use it as inspiration when polishing your own figures.</p>
-<section id="data" class="level2">
-<h2 class="anchored" data-anchor-id="data">Data</h2>
-<p>We use a custom-prepared subset of personality questionnaire data based on the <strong>Big Five Inventory (BFI)</strong> included in the <em>psych</em> R package by <strong>William Revelle (Northwestern University)</strong>.</p>
-<p>Original data source: Revelle, W. (2024). <em>psych: Procedures for Psychological, Psychometric, and Personality Research</em>. Available from CRAN: https://cran.r-project.org/package=psych</p>
-<p>What we use here:</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>In this topic, we explore <strong>spam detection</strong> as a practical example of classification in statistics and machine learning.</p>
+<p>We work with a real dataset derived from email text features (e.g., number of exclamation marks, dollar signs, capital letters), and use it to demonstrate how different models behave and how to <strong>interpret their output responsibly</strong>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This topic focuses on <strong>understanding models</strong>, not on achieving the highest possible accuracy.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>We use a classic spam dataset where each observation represents one email.</p>
+<section id="what-the-data-contain" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-data-contain">What the data contain</h3>
 <ul>
-<li>the original BFI dataset (25 self-report items + demographics),</li>
-<li>scored into five trait scales using <code>psych::scoreItems()</code>,</li>
-<li>cleaned, labeled, and saved as <code>bfi_traits.csv</code> for teaching purposes.</li>
+<li><strong>Predictors</strong>: numeric features extracted from email text (e.g., frequency of symbols or words)</li>
+<li><strong>Target variable</strong>: whether the email is spam or not</li>
 </ul>
-<p>If you want to reproduce the processed file, see <code>src/data_prep/bfi_traits.R</code>.</p>
-<p>
-<a href="../assets/data/bfi_traits.csv" download=""> Download the dataset (bfi_traits.csv) </a>
-</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load prepared dataset (created by src/data_prep/bfi_traits.R)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">read_csv2</span>(<span class="st">"../assets/data/bfi_traits.csv"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Base plot: keep geometry constant, no explicit theme here</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>base_plot <span class="ot">&lt;-</span> scores <span class="sc">%&gt;%</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> agree<span class="sc">:</span>openness,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"trait"</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"score"</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">factor</span>(gender, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)),</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">trait =</span> <span class="fu">factor</span>(</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      trait,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"agree"</span>, <span class="st">"conscientious"</span>, <span class="st">"extraversion"</span>, <span class="st">"neuroticism"</span>, <span class="st">"openness"</span>),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Agreeable"</span>, <span class="st">"Conscientious"</span>, <span class="st">"Extraversion"</span>, <span class="st">"Neuroticism"</span>, <span class="st">"Openness"</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> trait, <span class="at">y =</span> score, <span class="at">fill =</span> gender)) <span class="sc">+</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"BFI trait"</span>,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Score"</span>,</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"BFI scores by gender"</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Gender"</span>,</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#008000"</span>, <span class="st">"#800080"</span>)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(gender), <span class="at">labeller =</span> label_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>The dataset is intentionally simple: - no raw text - no deep learning - full focus on <strong>interpretability</strong></p>
 </section>
-<section id="default-look-no-theme-added" class="level2">
-<h2 class="anchored" data-anchor-id="default-look-no-theme-added">Default look (no theme added)</h2>
-<p>This is what ggplot uses by default (<code>theme_gray()</code>).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>base_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-default-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="download-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="download-the-data">Download the data</h3>
+<ul>
+<li>📄 Dataset: <code>spam.txt</code></li>
+<li>📜 Description: included in the scripts</li>
+</ul>
+<p>👉 <strong><a href="../assets/data/spam_detection_data.txt">Download dataset</a></strong></p>
+<hr>
 </section>
-<section id="theme_gray" class="level2">
-<h2 class="anchored" data-anchor-id="theme_gray">theme_gray()</h2>
-<p>The default ggplot theme with a light gray background.<br>
-Good when you want a “standard R look” or to emphasize the data over styling.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_gray</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-gray-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
 </section>
-<section id="theme_minimal" class="level2">
-<h2 class="anchored" data-anchor-id="theme_minimal">theme_minimal()</h2>
-<p>Very light, low‑ink design.<br>
-Nice for slides and papers when you want the plot to feel airy and modern.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-minimal-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="what-you-will-learn" class="level2">
+<h2 class="anchored" data-anchor-id="what-you-will-learn">What you will learn</h2>
+<p>After completing this section, you should be able to:</p>
+<ul>
+<li>explain spam detection as a classification problem</li>
+<li>fit and interpret a <strong>logistic regression</strong> model</li>
+<li>fit and interpret a <strong>decision tree</strong></li>
+<li>understand why different models can give different answers</li>
+<li>critically assess model output beyond accuracy numbers</li>
+</ul>
+<hr>
 </section>
-<section id="theme_classic" class="level2">
-<h2 class="anchored" data-anchor-id="theme_classic">theme_classic()</h2>
-<p>White background, clear axes, no gridlines.<br>
-Great for simple teaching plots and for publications where grids feel cluttered.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_classic</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-classic-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="sections" class="level2">
+<h2 class="anchored" data-anchor-id="sections">Sections</h2>
+<section id="supervised-models" class="level3">
+<h3 class="anchored" data-anchor-id="supervised-models">Supervised models</h3>
+<ul>
+<li>Logistic regression</li>
+<li>Decision trees</li>
+<li>Model interpretation and comparison</li>
+</ul>
+<p>👉 <strong><a href="spam_supervised.html">Go to supervised models →</a></strong></p>
 </section>
-<section id="theme_bw" class="level2">
-<h2 class="anchored" data-anchor-id="theme_bw">theme_bw()</h2>
-<p>Black‑and‑white theme with grids.<br>
-A safe “journal‑style” default, especially for printing.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-bw-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="optional-unsupervised-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="optional-unsupervised-exploration">Optional: Unsupervised exploration</h3>
+<ul>
+<li>Clustering</li>
+<li>Dimensionality reduction</li>
+<li>Why unsupervised methods struggle with spam detection</li>
+</ul>
+<p>👉 <strong><a href="spam_unsupervised.html">Go to unsupervised methods →</a></strong></p>
+<hr>
 </section>
-<section id="theme_light" class="level2">
-<h2 class="anchored" data-anchor-id="theme_light">theme_light()</h2>
-<p>Similar to <code>theme_gray()</code> but lighter and cleaner.<br>
-Good when you want grids, but less visual weight.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-light-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
 </section>
-<section id="theme_linedraw" class="level2">
-<h2 class="anchored" data-anchor-id="theme_linedraw">theme_linedraw()</h2>
-<p>Crisp black lines with minimal distractions.<br>
-Useful for technical figures and when you expect black‑and‑white reproduction.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_linedraw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-linedraw-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="theme_dark" class="level2">
-<h2 class="anchored" data-anchor-id="theme_dark">theme_dark()</h2>
-<p>Dark background with light grids.<br>
-Can work on dark slides, or when you want a dramatic contrast.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_dark</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-dark-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="theme_void" class="level2">
-<h2 class="anchored" data-anchor-id="theme_void">theme_void()</h2>
-<p>Removes everything except the data.<br>
-Good for artistic visuals, insets, or when you add your own annotations later.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>base_plot <span class="sc">+</span> <span class="fu">theme_void</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="theme_showcase_bfi_files/figure-html/theme-void-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="before-you-start" class="level2">
+<h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
+<p>You should be comfortable with:</p>
+<ul>
+<li>basic R syntax</li>
+<li>data frames</li>
+<li>simple visualisation</li>
+<li>probability and classification concepts</li>
+</ul>
+<p>If not, consider revisiting the <strong>Probability &amp; Simulation</strong> section first.</p>
 
 
 </section>

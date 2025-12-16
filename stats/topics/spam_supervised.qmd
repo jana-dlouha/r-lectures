@@ -1,0 +1,366 @@
+---
+title: "Spam detection (Supervised)"
+subtitle: "Logistic regression + decision trees: classification & interpretation"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+execute:
+  warning: false
+  message: false
+---
+
+## Goal of this section
+
+Here we treat spam detection as a **supervised classification** problem:
+
+- we have features extracted from emails (predictors)
+- we have a label (spam / not spam)
+- we train a model on a training set
+- we evaluate on a test set (data the model did not see)
+
+We focus on **interpretation** as much as on prediction:
+
+- What does a coefficient mean in logistic regression?
+- How do decision trees make decisions?
+- What does a confusion matrix actually tell us?
+- Why accuracy alone can be misleading?
+
+## Dataset
+
+- Dataset: `spam.txt`  
+[Download dataset](../assets/data/spam_detection_data.txt)
+
+Assumption used below:
+- last column is the label (TRUE / FALSE)
+- all other columns are numeric predictors
+
+## Setup
+
+```{r}
+library(tidyverse)
+
+# modelling
+library(rpart)
+library(rpart.plot)
+
+# evaluation
+library(yardstick)
+library(broom)
+```
+
+## Load data
+
+```{r}
+spam_raw <- read_csv2("../assets/data/spam_detection_data.csv", col_names = TRUE)
+
+spam <- spam_raw %>%
+  mutate(
+    row_id = row_number(),
+    label  = as.factor(yesno)
+  ) %>%
+  select(-yesno)
+
+# sanity checks (nepřeskakuj!)
+stopifnot("label" %in% names(spam))
+nlevels(spam$label)
+table(spam$label)
+
+glimpse(spam_raw)
+summary(spam_raw[, 1:6])
+```
+
+Create a clean data frame with a factor label.
+
+```{r}
+spam <- spam_raw %>%
+  rename(label = !!sym(names(spam_raw)[ncol(spam_raw)])) %>%
+  mutate(label = factor(label)) %>%
+  # ensure numeric predictors
+  mutate(across(-label, as.numeric))
+
+table(spam$label)
+```
+
+## Train / test split
+
+We use a **stratified split** to make sure both classes (spam / not spam) are present in the training set.
+This prevents rare edge cases where a random split accidentally puts almost all positives into test (or train),
+which can break some models (notably `rpart` probability predictions).
+
+```{r}
+set.seed(1)
+train_frac <- 0.7
+
+idx_train <- spam %>%
+  mutate(i = row_number()) %>%
+  group_by(label) %>%
+  slice_sample(prop = train_frac) %>%
+  ungroup() %>%
+  pull(i)
+
+train <- spam[idx_train, ]
+test  <- spam[-idx_train, ]
+
+nrow(train); nrow(test)
+table(train$label)
+table(test$label)
+```
+
+
+## Baseline (always predict the majority class)
+
+```{r}
+majority_class <- names(sort(table(train$label), decreasing = TRUE))[1]
+majority_class
+```
+
+```{r}
+majority_class <- names(sort(table(train$label), decreasing = TRUE))[1]
+
+baseline_pred <- factor(rep(majority_class, nrow(test)), levels = levels(train$label))
+
+yardstick::accuracy_vec(truth = test$label, estimate = baseline_pred)
+
+baseline_tbl <- tibble(truth = test$label, estimate = baseline_pred)
+yardstick::conf_mat(baseline_tbl, truth, estimate)
+```
+
+::: callout-tip
+### Why we start with a baseline
+If your “fancy model” cannot beat the baseline, something is wrong:
+- data leakage, coding mistake, or
+- the features contain little signal.
+:::
+
+## Model 1: Logistic regression
+
+### Fit
+
+We use a standard logistic regression (`glm(..., family = binomial)`).
+This model estimates:
+
+- **log-odds** of the positive class as a linear function of predictors
+- which can be converted to predicted probabilities
+
+```{r}
+fit_glm <- glm(label ~ ., data = train, family = binomial)
+summary(fit_glm)
+```
+
+### Predicted probabilities and class prediction
+
+```{r}
+p_glm <- predict(fit_glm, newdata = test, type = "response")
+head(p_glm)
+```
+
+Choose a decision threshold (default: 0.5).
+
+```{r}
+threshold <- 0.5
+pred_glm <- ifelse(p_glm >= threshold, levels(train$label)[2], levels(train$label)[1])
+pred_glm <- factor(pred_glm, levels = levels(train$label))
+```
+
+### Evaluation
+
+```{r}
+glm_tbl <- tibble(truth = test$label, estimate = pred_glm)
+yardstick::conf_mat(glm_tbl, truth, estimate)
+yardstick::accuracy_vec(truth = test$label, estimate = pred_glm)
+yardstick::sens_vec(truth = test$label, estimate = pred_glm)  # sensitivity / recall
+yardstick::spec_vec(truth = test$label, estimate = pred_glm)  # specificity
+yardstick::f_meas_vec(truth = test$label, estimate = pred_glm) # F1 score
+```
+
+### Interpretation: coefficients
+
+A coefficient tells you how the predictor changes the **log-odds** of the positive class
+while holding other predictors constant.
+
+To make this more intuitive, we can also look at **odds ratios**.
+
+```{r}
+coef_table <- broom::tidy(fit_glm) %>%
+  mutate(odds_ratio = exp(estimate)) %>%
+  arrange(desc(abs(estimate)))
+
+coef_table %>%
+  select(term, estimate, std.error, statistic, p.value, odds_ratio) %>%
+  print(n = 15)
+```
+
+::: callout-note
+### Practical reading tip
+- `odds_ratio > 1` increases odds of the positive class
+- `odds_ratio < 1` decreases odds  
+But: odds ratios are *not* probability changes, and correlated predictors can distort interpretation.
+:::
+
+## Model 2: Decision tree
+
+### Fit
+
+```{r}
+fit_tree <- rpart(label ~ ., data = train, method = "class")
+fit_tree
+```
+
+### Plot
+
+```{r}
+rpart.plot(fit_tree, type = 3, extra = 104, fallen.leaves = TRUE)
+```
+
+Interpretation reminder:
+- follow a path from the root to a leaf
+- each split is a rule
+- leaves show class proportions
+- always check support (how many cases reach a leaf)
+
+### Predict and evaluate
+
+In some `rpart` versions/data combinations, `predict(..., type = "prob")` can throw an internal error.
+For teaching purposes, **`type = "class"` is the most robust** and is enough for confusion matrices and metrics.
+
+```{r}
+pred_tree <- predict(fit_tree, newdata = test, type = "class")
+pred_tree <- factor(pred_tree, levels = levels(train$label))
+
+tree_tbl <- tibble(truth = test$label, estimate = pred_tree)
+yardstick::conf_mat(tree_tbl, truth, estimate)
+yardstick::accuracy_vec(truth = test$label, estimate = pred_tree)
+yardstick::f_meas_vec(truth = test$label, estimate = pred_tree)
+```
+
+(Optional) If you really want probabilities, try this chunk. If it fails on your system, just skip it.
+
+```{r}
+p_tree <- tryCatch(
+  predict(fit_tree, newdata = test, type = "prob"),
+  error = function(e) NULL
+)
+
+if (!is.null(p_tree)) {
+  head(p_tree)
+}
+```
+
+## Comparing models
+
+```{r}
+metrics <- tibble(
+  model = c("Baseline", "Logistic regression", "Decision tree"),
+  accuracy = c(
+    yardstick::accuracy_vec(test$label, baseline_pred),
+    yardstick::accuracy_vec(test$label, pred_glm),
+    yardstick::accuracy_vec(test$label, pred_tree)
+  ),
+  f1 = c(
+    yardstick::f_meas_vec(test$label, baseline_pred),
+    yardstick::f_meas_vec(test$label, pred_glm),
+    yardstick::f_meas_vec(test$label, pred_tree)
+  )
+)
+
+metrics
+```
+
+::: callout-warning
+### Accuracy is not enough
+If the classes are imbalanced, a model can have high accuracy while being useless.
+Always inspect:
+- confusion matrix
+- sensitivity/recall (how many positives you catch)
+- specificity (how many negatives you correctly reject)
+- F1 score (balance of precision/recall)
+:::
+
+## Threshold tuning (optional but useful)
+
+The 0.5 threshold is arbitrary.
+Depending on the cost of mistakes, you might prefer to catch more spam (higher sensitivity)
+even at the cost of more false positives.
+
+```{r}
+threshold_grid <- seq(0.1, 0.9, by = 0.05)
+
+threshold_results <- map_dfr(threshold_grid, function(t) {
+  pred <- factor(ifelse(p_glm >= t, levels(train$label)[2], levels(train$label)[1]),
+                 levels = levels(train$label))
+  tibble(
+    threshold = t,
+    accuracy = yardstick::accuracy_vec(test$label, pred),
+    sens = yardstick::sens_vec(test$label, pred),
+    spec = yardstick::spec_vec(test$label, pred),
+    f1 = yardstick::f_meas_vec(test$label, pred)
+  )
+})
+
+threshold_results %>%
+  pivot_longer(cols = c(accuracy, sens, spec, f1),
+               names_to = "metric", values_to = "value") %>%
+  ggplot(aes(threshold, value, color = metric)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Logistic regression: metrics vs threshold") +
+  theme_light()
+```
+
+## Exercises
+
+::: {.callout-tip collapse="true"}
+### Exercise 1: Baseline vs model
+
+- Compute the baseline accuracy (already done above).
+- Which model beats it? By how much?
+- Write one sentence explaining why baseline matters.
+:::
+
+::: {.callout-tip collapse="true"}
+### Exercise 2: Interpret one logistic coefficient
+
+Pick one predictor with a large absolute coefficient.
+- What is its sign?
+- What does that imply about odds?
+- Compute and interpret its odds ratio.
+:::
+
+::: {.callout-tip collapse="true"}
+### Exercise 3: Read a decision-tree rule
+
+Pick one leaf in the tree and write the rule as:
+
+> IF ... AND ... AND ... THEN predicted class = ... (with probability ≈ ...)
+
+Also report how much data reaches that leaf (support).
+:::
+
+::: {.callout-tip collapse="true"}
+### Exercise 4: Change the threshold
+
+Try thresholds 0.3 and 0.7 for the logistic regression.
+- Compare confusion matrices.
+- Which threshold would you prefer if missing spam is costly?
+- Which if false alarms are costly?
+:::
+
+## Solutions (brief)
+
+::: {.callout-warning collapse="true"}
+### Exercise 2 (solution sketch)
+
+A positive coefficient increases **log-odds** of the positive class.
+`exp(coef)` gives the odds ratio: values above 1 increase odds, below 1 decrease odds.
+Interpretation is conditional on other predictors and can be distorted by collinearity.
+:::
+
+::: {.callout-warning collapse="true"}
+### Exercise 3 (solution sketch)
+
+A path from root to leaf is a conjunction of split conditions.
+The leaf prediction is the majority class in that region; the probability shown is the class proportion within that leaf.
+Small support means the rule is “sharp” but applies to few cases.
+:::

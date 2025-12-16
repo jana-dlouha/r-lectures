@@ -1,0 +1,211 @@
+---
+title: "Spam detection (Unsupervised)"
+subtitle: "PCA + clustering: when we ignore the label"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+execute:
+  warning: false
+  message: false
+---
+
+## Goal of this section
+
+In the supervised part, we trained classifiers using known labels.
+Here we do the opposite: we **pretend that the label does not exist** and try to
+discover structure in the data using unsupervised methods.
+
+The goal is not performance, but understanding:
+
+- why **scaling** is crucial for unsupervised methods,
+- how **PCA** helps us *see* high-dimensional data,
+- why clustering results are always **hypotheses**, not ground truth.
+
+## Dataset
+
+We work with a classic spam dataset where:
+
+- rows correspond to individual emails
+- columns are numeric text features (e.g., frequencies of certain tokens)
+- the last column is a binary label (spam / not spam)
+
+In this section, the label will be used **only for evaluation after the fact**.
+
+### Download
+
+- Dataset: `spam_detection_data.txt`
+
+[Download dataset](../assets/data/spam_detection_data.txt)
+
+## Setup
+
+```{r}
+library(tidyverse)
+library(cluster)    # silhouette
+library(factoextra) # PCA / clustering helpers
+```
+
+## Loading the data
+
+```{r}
+spam_raw <- read_csv2("../assets/data/spam_detection_data.csv", col_names = TRUE)
+
+spam_raw <- spam_raw %>% mutate(row_id = row_number())
+
+glimpse(spam_raw)
+summary(spam_raw[, 1:6])
+```
+
+Extract the label (last column) and inspect its distribution.
+
+```{r}
+
+label_df <- spam_raw %>%
+  transmute(row_id, label = dplyr::pull(., ncol(.) - 1)) %>%  # last column before row_id
+  mutate(label = factor(label))
+
+table(label_df$label)
+```
+
+## Creating an unsupervised dataset
+
+We now remove the label and keep only numeric features.  
+Important: after cleaning (dropping rows / columns), we must keep the label **aligned** with the remaining rows.
+
+```{r}
+# 2) Label (in your data it is 'yesno' TRUE/FALSE)
+label_df <- spam_raw %>%
+  transmute(row_id, label = factor(yesno))
+
+# 3) Predictors only (drop label, keep row_id)
+X_df <- spam_raw %>%
+  select(-yesno)    # keep row_id!
+
+# 4) Make numeric matrix for PCA/k-means (drop row_id)
+X_mat <- X_df %>%
+  select(-row_id) %>%
+  mutate(across(everything(), as.numeric)) %>%
+  as.matrix()
+
+# 5) Remove rows with any non-finite values (NA/NaN/Inf)
+keep_rows <- apply(is.finite(X_mat), 1, all)
+X_mat <- X_mat[keep_rows, , drop = FALSE]
+row_id_kept <- X_df$row_id[keep_rows]
+
+# 6) Remove zero-variance columns (otherwise scaling creates NA)
+sds <- apply(X_mat, 2, sd)
+keep_cols <- is.finite(sds) & sds > 0
+X_mat <- X_mat[, keep_cols, drop = FALSE]
+
+# 7) Scale
+X_scaled <- scale(X_mat)
+stopifnot(all(is.finite(X_scaled)))
+
+# 8) Align label to remaining rows
+label_kept <- label_df$label[match(row_id_kept, label_df$row_id)]
+stopifnot(length(label_kept) == nrow(X_scaled))
+```
+## PCA: visualizing structure
+
+```{r}
+pca <- prcomp(X_scaled, center = TRUE, scale. = FALSE)
+summary(pca)
+```
+
+Projection onto the first two principal components:
+
+```{r}
+pca_df <- as_tibble(pca$x[, 1:2]) %>%
+  mutate(label = label_kept)
+
+ggplot(pca_df, aes(PC1, PC2, color = label)) +
+  geom_jitter(alpha = 0.7, size = 2) +
+  labs(
+    title = "PCA projection (PC1 vs PC2)",
+    subtitle = "True labels shown only for post-hoc inspection"
+  ) +
+  theme_light()
+```
+
+Interpretation:
+PCA does not find clusters. It finds directions of maximal variance.
+If spam and non-spam separate here, the signal is strong.
+If not, the difference may be weak or hidden in higher dimensions.
+
+## k-means clustering
+
+### k = 2 (spam vs not spam hypothesis)
+
+```{r}
+set.seed(1)
+km2 <- kmeans(X_scaled, centers = 2, nstart = 25)
+
+table(cluster = km2$cluster, label = label_kept)
+```
+
+### Silhouette analysis
+
+```{r}
+set.seed(1)
+idx <- sample(seq_len(nrow(X_scaled)), 300)
+
+sil_small <- silhouette(km2$cluster[idx], dist(X_scaled[idx, ]))
+plot(sil_small)
+
+```
+
+### Choosing k systematically
+
+```{r}
+k_grid <- 2:8
+
+sil_scores <- map_dbl(k_grid, function(k) {
+  km <- kmeans(X_scaled, centers = k, nstart = 25)
+  mean(silhouette(km$cluster, dist(X_scaled))[, 3])
+})
+
+tibble(k = k_grid, silhouette = sil_scores) %>%
+  ggplot(aes(k, silhouette)) +
+  geom_line(size = 2) +
+  geom_point(size = 3) +
+  theme_light() +
+  labs(title = "Silhouette score vs number of clusters")
+```
+
+## Exercises
+
+::: {.callout-tip collapse="true"}
+### Exercise 1: What happens without scaling?
+
+- Run PCA on `X` instead of `X_scaled`.
+- Compare explained variance and the PC1–PC2 plot.
+- Explain the difference in two sentences.
+:::
+
+::: {.callout-tip collapse="true"}
+### Exercise 2: Are clusters the same as labels?
+
+- For k = 2, inspect `table(cluster, label)`.
+- Compute a simple cluster purity.
+- Explain why this is not the same as classification accuracy.
+:::
+
+::: {.callout-tip collapse="true"}
+### Exercise 3: Choosing k
+
+- Find the k that maximizes the silhouette score.
+- Inspect the cluster–label table for this k.
+- Discuss whether a higher silhouette always means a better solution
+  for the spam detection problem.
+:::
+
+## Solutions (brief)
+
+::: {.callout-warning collapse="true"}
+### Exercise 1 (solution sketch)
+
+Without scaling, variables with larger variance dominate both PCA and k-means.
+Standardization ensures that all features contribute comparably, regardless of their original scale.
+:::

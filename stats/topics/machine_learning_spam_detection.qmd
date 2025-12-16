@@ -1,0 +1,92 @@
+---
+title: "Machine Learning & Spam Detection"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+execute:
+  echo: false
+---
+
+## Overview
+
+In this topic, we explore **spam detection** as a practical example of
+classification in statistics and machine learning.
+
+We work with a real dataset derived from email text features
+(e.g., number of exclamation marks, dollar signs, capital letters),
+and use it to demonstrate how different models behave and how to
+**interpret their output responsibly**.
+
+::: callout-note
+This topic focuses on **understanding models**, not on achieving the highest possible accuracy.
+:::
+
+---
+
+## Dataset
+
+We use a classic spam dataset where each observation represents one email.
+
+### What the data contain
+
+- **Predictors**: numeric features extracted from email text
+  (e.g., frequency of symbols or words)
+- **Target variable**: whether the email is spam or not
+
+The dataset is intentionally simple:
+- no raw text
+- no deep learning
+- full focus on **interpretability**
+
+### Download the data
+
+- 📄 Dataset: `spam.txt`
+- 📜 Description: included in the scripts
+
+👉 **[Download dataset](../assets/data/spam_detection_data.txt)**
+
+---
+
+## What you will learn
+
+After completing this section, you should be able to:
+
+- explain spam detection as a classification problem
+- fit and interpret a **logistic regression** model
+- fit and interpret a **decision tree**
+- understand why different models can give different answers
+- critically assess model output beyond accuracy numbers
+
+---
+
+## Sections
+
+### Supervised models
+
+- Logistic regression
+- Decision trees
+- Model interpretation and comparison
+
+👉 **[Go to supervised models →](spam_supervised.html)**
+
+### Optional: Unsupervised exploration
+
+- Clustering
+- Dimensionality reduction
+- Why unsupervised methods struggle with spam detection
+
+👉 **[Go to unsupervised methods →](spam_unsupervised.html)**
+
+---
+
+## Before you start
+
+You should be comfortable with:
+
+- basic R syntax
+- data frames
+- simple visualisation
+- probability and classification concepts
+
+If not, consider revisiting the **Probability & Simulation** section first.

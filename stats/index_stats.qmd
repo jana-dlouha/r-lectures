@@ -84,6 +84,47 @@ Each topic combines explanation, hands-on code, and a foldable solution, so you 
   </div>
 </div>
 
+<!-- Machine learning & spam detection -->
+<div class="gallery-card">
+  <a href="topics/machine_learning_spam_detection.html">
+    <img src="assets/img/placeholder.png"
+         alt="Machine learning & spam detection in R">
+  </a>
+  <div class="gallery-title">Machine Learning & Spam Detection</div>
+  <div class="gallery-meta">Level 3 • classification & interpretation</div>
+  <div class="gallery-desc">
+    Detect spam using real text features. Learn how classification models work,
+    how decision trees make predictions, and how to interpret model output responsibly.
+  </div>
+</div>
+
+<!-- ML: supervised -->
+<div class="gallery-card">
+  <a href="topics/spam_supervised.html">
+    <img src="assets/img/placeholder.png"
+         alt="Supervised spam classification in R">
+  </a>
+  <div class="gallery-title">Spam Detection – Supervised Models</div>
+  <div class="gallery-meta">Level 3 • logistic regression & trees</div>
+  <div class="gallery-desc">
+    Train/test split, logistic regression, decision trees, confusion matrix, and interpretation.
+  </div>
+</div>
+
+<!-- ML: unsupervised (optional) -->
+<div class="gallery-card">
+  <a href="topics/spam_unsupervised.html">
+    <img src="assets/img/placeholder.png"
+         alt="Unsupervised exploration for spam features in R">
+  </a>
+  <div class="gallery-title">Spam Detection – Unsupervised (Optional)</div>
+  <div class="gallery-meta">Level 3 • clustering & structure</div>
+  <div class="gallery-desc">
+    Explore structure without labels: clustering and dimensionality reduction.
+    Learn when unsupervised methods help — and when they don’t.
+  </div>
+</div>
+
 [//]: # (<!-- Power & sample size -->)
 
 [//]: # (<div class="gallery-card">)
